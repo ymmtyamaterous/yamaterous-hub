@@ -24,7 +24,25 @@ export default function UserMenu() {
   if (!session) {
     return (
       <Link to="/login">
-        <Button variant="outline">Sign In</Button>
+        <Button
+          variant="outline"
+          style={{
+            fontFamily: "var(--sc-font-mono)",
+            fontSize: "12px",
+            letterSpacing: "0.1em",
+            color: "#fff",
+            background: "var(--sc-sakura)",
+            border: "none",
+            borderRadius: "2px",
+            padding: "0.45rem 1.1rem",
+            fontWeight: 700,
+            boxShadow: "0 2px 12px rgba(200,0,90,0.3)",
+            cursor: "pointer",
+          }}
+          className="hover:opacity-90"
+        >
+          SIGN IN
+        </Button>
       </Link>
     );
   }
@@ -39,15 +57,16 @@ export default function UserMenu() {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/admin">Admin</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
             onClick={() => {
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
-                    navigate({
-                      to: "/",
-                    });
+                    navigate({ to: "/" });
                   },
                 },
               });

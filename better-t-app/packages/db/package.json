@@ -14,7 +14,8 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "test": "bun test src/__tests__"
   },
   "dependencies": {
     "@better-t-app/env": "workspace:*",
@@ -25,6 +26,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@better-t-app/api": "workspace:*",
     "@better-t-app/config": "workspace:*",
     "drizzle-kit": "^0.31.8",
     "typescript": "catalog:"

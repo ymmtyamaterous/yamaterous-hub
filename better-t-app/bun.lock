@@ -30,6 +30,7 @@
         "@orpc/zod": "catalog:",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
+        "drizzle-orm": "^0.45.1",
         "hono": "catalog:",
         "zod": "catalog:",
       },
@@ -93,10 +94,12 @@
         "@orpc/server": "catalog:",
         "@orpc/zod": "catalog:",
         "dotenv": "catalog:",
+        "drizzle-orm": "^0.45.1",
         "zod": "catalog:",
       },
       "devDependencies": {
         "@better-t-app/config": "workspace:*",
+        "@libsql/client": "catalog:",
         "hono": "catalog:",
         "typescript": "catalog:",
       },
@@ -130,6 +133,7 @@
         "zod": "catalog:",
       },
       "devDependencies": {
+        "@better-t-app/api": "workspace:*",
         "@better-t-app/config": "workspace:*",
         "drizzle-kit": "^0.31.8",
         "typescript": "catalog:",

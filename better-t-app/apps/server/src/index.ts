@@ -10,6 +10,15 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { serveStatic } from "hono/bun";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { runMigrationsAndSeed } from "./setup";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+
+// 起動時に DB マイグレーションとシードを実行
+await runMigrationsAndSeed();
 
 const app = new Hono();
 
@@ -73,6 +82,25 @@ app.use("/*", async (c, next) => {
 
 app.get("/", (c) => {
   return c.text("OK");
+});
+
+// 静的ファイル配信（本番ビルド時）
+const staticDir = resolve(__dirname, "../../web/dist");
+app.use(
+  "/*",
+  serveStatic({
+    root: staticDir,
+  }),
+);
+// SPA フォールバック
+app.get("*", async (c) => {
+  const indexFile = Bun.file(resolve(staticDir, "index.html"));
+  if (await indexFile.exists()) {
+    return new Response(indexFile, {
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+  return c.text("Not Found", 404);
 });
 
 export default app;
