@@ -11,7 +11,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
-import { resolve, join } from "node:path";
+import { resolve, join, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mkdir } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
@@ -23,7 +23,9 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 await runMigrationsAndSeed();
 
 // アップロードディレクトリを作成
-const uploadsDir = resolve(__dirname, "../uploads");
+const uploadsDir = env.UPLOADS_DIR
+  ? resolve(env.UPLOADS_DIR)
+  : resolve(__dirname, "../uploads");
 await mkdir(uploadsDir, { recursive: true });
 
 const app = new Hono();
@@ -82,7 +84,14 @@ app.post("/api/upload", async (c) => {
 });
 
 // アップロードファイルの静的配信
-app.use("/uploads/*", serveStatic({ root: resolve(__dirname, "..") }));
+app.use(
+  "/uploads/*",
+  serveStatic({
+    root: dirname(uploadsDir),
+    rewriteRequestPath: (path) =>
+      path.replace(/^\/uploads\//, `/${basename(uploadsDir)}/`),
+  }),
+);
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
