@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@better-t-app/ui/components/dropdown-menu";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -112,10 +112,10 @@ export default function UserMenu() {
           </DropdownMenuItem>
           <DropdownMenuItem
             style={scItem}
-            asChild
             className="hover:!text-[var(--sc-sakura)] hover:!bg-[var(--sc-surface)]"
+            onClick={() => navigate({ to: "/admin" })}
           >
-            <Link to="/admin">管理画面</Link>
+            管理画面
           </DropdownMenuItem>
           <DropdownMenuSeparator style={{ background: "rgba(200,0,90,0.1)" }} />
           <DropdownMenuItem
