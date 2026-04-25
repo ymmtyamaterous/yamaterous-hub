@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { X } from "lucide-react";
-import { useState } from "react";
+import { ImagePlus, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@better-t-app/ui/components/button";
 import { Input } from "@better-t-app/ui/components/input";
 import { Label } from "@better-t-app/ui/components/label";
 
+import { env } from "@better-t-app/env/web";
 import { orpc } from "@/utils/orpc";
 
 export interface WorkFormValues {
@@ -69,6 +70,39 @@ export function WorkForm({
   });
 
   const [newTagName, setNewTagName] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${env.VITE_SERVER_URL}/api/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error ?? "Upload failed");
+      }
+
+      const data = await res.json() as { url: string };
+      setValues((v) => ({ ...v, thumbnailUrl: `${env.VITE_SERVER_URL}${data.url}` }));
+      toast.success("画像をアップロードしました");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "アップロードに失敗しました");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const { data: allTags = [] } = useQuery(orpc.tags.list.queryOptions());
 
@@ -155,17 +189,102 @@ export function WorkForm({
         />
       </div>
 
-      {/* サムネイル URL */}
+      {/* サムネイル */}
       <div style={fieldWrapStyle}>
-        <Label style={labelStyle}>THUMBNAIL URL</Label>
+        <Label style={labelStyle}>THUMBNAIL</Label>
+
+        {/* プレビュー */}
+        {values.thumbnailUrl && (
+          <div style={{ position: "relative", display: "inline-block", width: "180px" }}>
+            <img
+              src={values.thumbnailUrl}
+              alt="thumbnail preview"
+              style={{
+                width: "180px",
+                height: "100px",
+                objectFit: "cover",
+                border: "1px solid rgba(200,0,90,0.2)",
+                borderRadius: "2px",
+                display: "block",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setValues((v) => ({ ...v, thumbnailUrl: "" }))}
+              style={{
+                position: "absolute",
+                top: "4px",
+                right: "4px",
+                background: "rgba(200,0,90,0.85)",
+                border: "none",
+                borderRadius: "50%",
+                width: "20px",
+                height: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "#fff",
+              }}
+              aria-label="サムネイルを削除"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        )}
+
+        {/* ファイル選択ボタン */}
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            style={{ display: "none" }}
+            onChange={handleFileSelect}
+          />
+          <button
+            type="button"
+            disabled={isUploading}
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "11px",
+              letterSpacing: "0.08em",
+              padding: "0.4rem 0.85rem",
+              border: "1px solid rgba(200,0,90,0.3)",
+              borderRadius: "2px",
+              background: "transparent",
+              color: "var(--sc-sakura)",
+              cursor: isUploading ? "not-allowed" : "pointer",
+              opacity: isUploading ? 0.5 : 1,
+              transition: "all 0.2s",
+            }}
+          >
+            <ImagePlus size={13} />
+            {isUploading ? "アップロード中..." : "画像を選択"}
+          </button>
+          <span
+            style={{
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "10px",
+              color: "var(--sc-muted)",
+              opacity: 0.6,
+            }}
+          >
+            jpeg / png / gif / webp · 5MB以内
+          </span>
+        </div>
+
+        {/* URL 直接入力（オプション） */}
         <Input
           value={values.thumbnailUrl}
-          onChange={(e) =>
-            setValues((v) => ({ ...v, thumbnailUrl: e.target.value }))
-          }
-          style={inputStyle}
+          onChange={(e) => setValues((v) => ({ ...v, thumbnailUrl: e.target.value }))}
+          style={{ ...inputStyle, fontSize: "12px" }}
           type="url"
-          placeholder="https://..."
+          placeholder="または URL を直接入力..."
         />
       </div>
 
