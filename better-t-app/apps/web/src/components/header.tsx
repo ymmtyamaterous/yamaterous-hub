@@ -88,7 +88,7 @@ export default function Header() {
             activeProps={{
               style: {
                 color: "var(--sc-sakura)",
-                borderColor: "rgba(200,0,90,0.3)",
+                border: "1px solid rgba(200,0,90,0.3)",
                 background: "var(--sc-surface)",
               },
             }}

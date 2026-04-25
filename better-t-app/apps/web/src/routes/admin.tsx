@@ -69,7 +69,7 @@ function AdminLayout() {
                 style: {
                   color: "var(--sc-sakura)",
                   background: "var(--sc-surface)",
-                  borderLeftColor: "var(--sc-sakura)",
+                  borderLeft: "2px solid var(--sc-sakura)",
                   paddingLeft: "calc(1.5rem - 2px)",
                 },
               }}
