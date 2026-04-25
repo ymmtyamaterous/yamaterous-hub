@@ -15,8 +15,8 @@ export const Route = createFileRoute("/admin")({
 
 const navItems = [
   { to: "/admin" as const, label: "ダッシュボード", exact: true },
-  { to: "/admin/works" as const, label: "作品管理" },
-  { to: "/admin/profile" as const, label: "プロフィール" },
+  { to: "/admin/works" as const, label: "作品管理", exact: false },
+  { to: "/admin/profile" as const, label: "プロフィール", exact: false },
 ] as const;
 
 function AdminLayout() {
@@ -46,10 +46,11 @@ function AdminLayout() {
           // ADMIN
         </div>
         <nav>
-          {navItems.map(({ to, label }) => (
+          {navItems.map(({ to, label, exact }) => (
             <Link
               key={to}
               to={to}
+              activeOptions={{ exact }}
               style={{
                 display: "block",
                 fontFamily: "var(--sc-font-mono)",
@@ -58,6 +59,8 @@ function AdminLayout() {
                 color: "var(--sc-muted)",
                 textDecoration: "none",
                 padding: "0.6rem 1.5rem",
+                paddingLeft: "calc(1.5rem - 2px)",
+                borderLeft: "2px solid transparent",
                 transition: "all 0.15s",
               }}
               className="hover:!text-[var(--sc-sakura)] hover:!bg-[var(--sc-surface)] dark:!text-neutral-400"
@@ -65,7 +68,7 @@ function AdminLayout() {
                 style: {
                   color: "var(--sc-sakura)",
                   background: "var(--sc-surface)",
-                  borderLeft: "2px solid var(--sc-sakura)",
+                  borderLeftColor: "var(--sc-sakura)",
                   paddingLeft: "calc(1.5rem - 2px)",
                 },
               }}
