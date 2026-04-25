@@ -26,7 +26,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@better-t-app/api": "workspace:*",
     "@better-t-app/config": "workspace:*",
     "drizzle-kit": "^0.31.8",
     "typescript": "catalog:"

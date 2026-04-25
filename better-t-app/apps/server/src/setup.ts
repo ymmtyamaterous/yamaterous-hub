@@ -15,7 +15,10 @@ const ADMIN_NAME = "Yamaterous";
 
 export async function runMigrationsAndSeed() {
   // マイグレーション実行
-  const migrationsFolder = resolve(__dirname, "../../../packages/db/src/migrations");
+  // MIGRATIONS_FOLDER 環境変数が設定されている場合はそちらを優先（Docker環境向け）
+  const migrationsFolder =
+    process.env.MIGRATIONS_FOLDER ??
+    resolve(__dirname, "../../../packages/db/src/migrations");
   await migrate(db, { migrationsFolder });
 
   // シード: profile が存在しなければ初期レコードを挿入
