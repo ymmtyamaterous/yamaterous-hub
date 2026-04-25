@@ -1,22 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { authClient } from "@/lib/auth-client";
-import { orpc } from "@/utils/orpc";
-
 export const Route = createFileRoute("/dashboard")({
-  component: RouteComponent,
-  beforeLoad: async () => {
-    const session = await authClient.getSession();
-    if (!session.data) {
-      redirect({
-        to: "/login",
-        throw: true,
-      });
-    }
-    return { session };
+  beforeLoad: () => {
+    throw redirect({ to: "/admin" });
   },
+  component: () => null,
 });
+
 
 function RouteComponent() {
   const { session } = Route.useRouteContext();

@@ -8,6 +8,7 @@ import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useState } from "react";
 
+import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { link, orpc } from "@/utils/orpc";
@@ -24,11 +25,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "better-t-app",
+        title: "Yamaterous Hub",
       },
       {
         name: "description",
-        content: "better-t-app is a web application",
+        content: "Yamaterous Hub — やまてろすのポートフォリオサイト",
       },
     ],
     links: [
@@ -49,13 +50,23 @@ function RootComponent() {
       <HeadContent />
       <ThemeProvider
         attribute="class"
-        defaultTheme="dark"
+        defaultTheme="light"
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
+        {/* 背景エフェクト */}
+        <div className="sc-grid-bg" />
+        <div className="sc-glow-blob sc-gb1" />
+        <div className="sc-glow-blob sc-gb2" />
+        <div className="sc-glow-blob sc-gb3" />
+
+        <div className="flex flex-col min-h-svh" style={{ position: "relative", zIndex: 1 }}>
           <Header />
-          <Outlet />
+          {/* ヘッダー分のパディング */}
+          <main className="flex-1 pt-[72px]">
+            <Outlet />
+          </main>
+          <Footer />
         </div>
         <Toaster richColors />
       </ThemeProvider>
