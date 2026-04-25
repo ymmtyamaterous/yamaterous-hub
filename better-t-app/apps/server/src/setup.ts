@@ -1,10 +1,17 @@
+import { auth } from "@better-t-app/auth";
 import { db } from "@better-t-app/db";
+import { user } from "@better-t-app/db/schema/auth";
 import { profile } from "@better-t-app/db/schema/content";
+import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
+
+const ADMIN_EMAIL = "ymmtyamaterous@gmail.com";
+const ADMIN_PASSWORD = "password";
+const ADMIN_NAME = "Yamaterous";
 
 export async function runMigrationsAndSeed() {
   // マイグレーション実行
@@ -12,11 +19,11 @@ export async function runMigrationsAndSeed() {
   await migrate(db, { migrationsFolder });
 
   // シード: profile が存在しなければ初期レコードを挿入
-  const existing = await db.select().from(profile).limit(1);
-  if (existing.length === 0) {
+  const existingProfile = await db.select().from(profile).limit(1);
+  if (existingProfile.length === 0) {
     await db.insert(profile).values({
       id: "default",
-      displayName: "Yamaterous",
+      displayName: ADMIN_NAME,
       bio: "",
       avatarUrl: null,
       githubUrl: null,
@@ -24,6 +31,23 @@ export async function runMigrationsAndSeed() {
       siteUrl: null,
     });
     console.log("[seed] Profile initial record inserted.");
+  }
+
+  // シード: 管理者ユーザーが存在しなければ作成
+  const existingUser = await db
+    .select()
+    .from(user)
+    .where(eq(user.email, ADMIN_EMAIL))
+    .limit(1);
+  if (existingUser.length === 0) {
+    await auth.api.signUpEmail({
+      body: {
+        email: ADMIN_EMAIL,
+        password: ADMIN_PASSWORD,
+        name: ADMIN_NAME,
+      },
+    });
+    console.log(`[seed] Admin user created: ${ADMIN_EMAIL}`);
   }
 
   console.log("[db] Migration and seed completed.");
