@@ -42,6 +42,9 @@ export default function Header() {
           <span style={{ color: "var(--sc-sakura)", textShadow: "var(--sc-glow-pink)" }}>
             Yamaterous
           </span>
+          <span style={{ color: "var(--sc-text)" }} className="dark:!text-neutral-100">
+            {" Hub"}
+          </span>
           <span
             style={{
               display: "block",
