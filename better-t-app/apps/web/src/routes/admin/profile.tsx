@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -7,6 +8,7 @@ import { Button } from "@better-t-app/ui/components/button";
 import { Input } from "@better-t-app/ui/components/input";
 import { Label } from "@better-t-app/ui/components/label";
 
+import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/admin/profile")({
@@ -41,6 +43,16 @@ function AdminProfilePage() {
   });
   const [initialized, setInitialized] = useState(false);
 
+  const [pwForm, setPwForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isChangingPw, setIsChangingPw] = useState(false);
+
   if (profile && !initialized) {
     setForm({
       displayName: profile.displayName,
@@ -73,6 +85,36 @@ function AdminProfilePage() {
       twitterUrl: form.twitterUrl || null,
       siteUrl: form.siteUrl || null,
     });
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      toast.error("新しいパスワードが一致しません");
+      return;
+    }
+    if (pwForm.newPassword.length < 8) {
+      toast.error("パスワードは8文字以上で設定してください");
+      return;
+    }
+    setIsChangingPw(true);
+    try {
+      const res = await authClient.changePassword({
+        currentPassword: pwForm.currentPassword,
+        newPassword: pwForm.newPassword,
+        revokeOtherSessions: false,
+      });
+      if (res.error) {
+        toast.error(res.error.message ?? "パスワードの変更に失敗しました");
+      } else {
+        toast.success("パスワードを変更しました");
+        setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      }
+    } catch {
+      toast.error("パスワードの変更に失敗しました");
+    } finally {
+      setIsChangingPw(false);
+    }
   };
 
   if (isLoading) {
@@ -230,6 +272,147 @@ function AdminProfilePage() {
           </Button>
         </div>
       </form>
+
+      {/* ── パスワード変更 ── */}
+      <div
+        style={{
+          marginTop: "3rem",
+          paddingTop: "2rem",
+          borderTop: "1px solid rgba(200,0,90,0.12)",
+          maxWidth: "560px",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--sc-font-mono)",
+            fontSize: "10px",
+            letterSpacing: "0.2em",
+            color: "var(--sc-cyber)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          // SECURITY
+        </div>
+        <h2
+          style={{
+            fontFamily: "var(--sc-font-jp)",
+            fontWeight: 900,
+            fontSize: "1.3rem",
+            color: "var(--sc-text)",
+            marginBottom: "1.5rem",
+          }}
+          className="dark:!text-neutral-100"
+        >
+          パスワード変更
+        </h2>
+
+        <form
+          onSubmit={handlePasswordChange}
+          style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
+        >
+          {/* 現在のパスワード */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <Label style={labelStyle}>現在のパスワード</Label>
+            <div style={{ position: "relative" }}>
+              <Input
+                type={showCurrent ? "text" : "password"}
+                value={pwForm.currentPassword}
+                onChange={(e) => setPwForm((v) => ({ ...v, currentPassword: e.target.value }))}
+                style={{ ...inputStyle, paddingRight: "2.5rem" }}
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrent((v) => !v)}
+                style={{
+                  position: "absolute", right: "0.6rem", top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "var(--sc-muted)", padding: "0.2rem",
+                }}
+              >
+                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {/* 新しいパスワード */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <Label style={labelStyle}>新しいパスワード（8文字以上）</Label>
+            <div style={{ position: "relative" }}>
+              <Input
+                type={showNew ? "text" : "password"}
+                value={pwForm.newPassword}
+                onChange={(e) => setPwForm((v) => ({ ...v, newPassword: e.target.value }))}
+                style={{ ...inputStyle, paddingRight: "2.5rem" }}
+                required
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew((v) => !v)}
+                style={{
+                  position: "absolute", right: "0.6rem", top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "var(--sc-muted)", padding: "0.2rem",
+                }}
+              >
+                {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {/* パスワード確認 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <Label style={labelStyle}>新しいパスワード（確認）</Label>
+            <div style={{ position: "relative" }}>
+              <Input
+                type={showConfirm ? "text" : "password"}
+                value={pwForm.confirmPassword}
+                onChange={(e) => setPwForm((v) => ({ ...v, confirmPassword: e.target.value }))}
+                style={{ ...inputStyle, paddingRight: "2.5rem" }}
+                required
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                style={{
+                  position: "absolute", right: "0.6rem", top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "var(--sc-muted)", padding: "0.2rem",
+                }}
+              >
+                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <Button
+              type="submit"
+              disabled={isChangingPw}
+              style={{
+                fontFamily: "var(--sc-font-mono)",
+                fontSize: "12px",
+                letterSpacing: "0.1em",
+                color: "#fff",
+                background: "linear-gradient(90deg, var(--sc-cyber), var(--sc-cyber2))",
+                border: "none",
+                borderRadius: "2px",
+                padding: "0.6rem 1.5rem",
+                fontWeight: 700,
+                cursor: isChangingPw ? "not-allowed" : "pointer",
+              }}
+            >
+              {isChangingPw ? "変更中..." : "パスワードを変更する"}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
