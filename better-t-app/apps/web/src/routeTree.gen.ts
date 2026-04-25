@@ -9,8 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AdminLoginHubRouteImport } from './routes/admin-login-hub'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
@@ -21,14 +21,14 @@ import { Route as AdminWorksIndexRouteImport } from './routes/admin/works/index'
 import { Route as AdminWorksNewRouteImport } from './routes/admin/works/new'
 import { Route as AdminWorksWorkIdEditRouteImport } from './routes/admin/works/$workId/edit'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginHubRoute = AdminLoginHubRouteImport.update({
+  id: '/admin-login-hub',
+  path: '/admin-login-hub',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -80,8 +80,8 @@ const AdminWorksWorkIdEditRoute = AdminWorksWorkIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
   '/admin/profile': typeof AdminProfileRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -92,8 +92,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
   '/admin/profile': typeof AdminProfileRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin': typeof AdminIndexRoute
@@ -106,8 +106,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
   '/admin/profile': typeof AdminProfileRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -121,8 +121,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin-login-hub'
     | '/dashboard'
-    | '/login'
     | '/admin/profile'
     | '/works/$workId'
     | '/admin/'
@@ -133,8 +133,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin-login-hub'
     | '/dashboard'
-    | '/login'
     | '/admin/profile'
     | '/works/$workId'
     | '/admin'
@@ -146,8 +146,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/admin-login-hub'
     | '/dashboard'
-    | '/login'
     | '/admin/profile'
     | '/works/$workId'
     | '/admin/'
@@ -160,26 +160,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AdminLoginHubRoute: typeof AdminLoginHubRoute
   DashboardRoute: typeof DashboardRoute
-  LoginRoute: typeof LoginRoute
   WorksWorkIdRoute: typeof WorksWorkIdRoute
   WorksIndexRoute: typeof WorksIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login-hub': {
+      id: '/admin-login-hub'
+      path: '/admin-login-hub'
+      fullPath: '/admin-login-hub'
+      preLoaderRoute: typeof AdminLoginHubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -269,8 +269,8 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AdminLoginHubRoute: AdminLoginHubRoute,
   DashboardRoute: DashboardRoute,
-  LoginRoute: LoginRoute,
   WorksWorkIdRoute: WorksWorkIdRoute,
   WorksIndexRoute: WorksIndexRoute,
 }

@@ -6,7 +6,7 @@ export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     const session = await authClient.getSession();
     if (!session.data) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: "/admin-login-hub" });
     }
     return { session: session.data };
   },
