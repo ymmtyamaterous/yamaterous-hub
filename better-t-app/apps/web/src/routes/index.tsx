@@ -146,7 +146,12 @@ function HomeComponent() {
     return () => io.disconnect();
   }, [featuredWorks]);
 
-  const displayName = profile?.displayName ?? "";
+  const displayName = profile?.h1Line1 || profile?.displayName || "";
+  const h1Line2 = profile?.h1Line2 ?? "のポートフォリオ";
+  const h1Line3 = profile?.h1Line3 ?? "hub.";
+  const heroTagline = profile?.heroTagline ?? "Portfolio · やまてろす";
+  const heroGreeting = profile?.heroGreeting ?? "Hello_World();";
+  const heroSubText = profile?.heroSubText || profile?.bio || "";
 
   return (
     <div style={{ position: "relative", overflow: "hidden" }}>
@@ -186,18 +191,20 @@ function HomeComponent() {
             <span style={{ color: "var(--sc-muted)" }}>[</span>
             SYS_ONLINE
             <span style={{ color: "var(--sc-muted)" }}>]</span>
-            &nbsp; Portfolio · やまてろす
+            &nbsp; {heroTagline}
           </div>
 
           {/* h1 with glitch */}
           <h1 className="sc-h1">
-            {displayName ? (
+            {profile ? (
               <>
-                <span className="sc-h1-cyber" data-text={displayName}>
-                  {displayName}
-                </span>
-                <span className="sc-h1-white">のポートフォリオ</span>
-                <span className="sc-h1-outline">hub.</span>
+                {displayName && (
+                  <span className="sc-h1-cyber" data-text={displayName}>
+                    {displayName}
+                  </span>
+                )}
+                {h1Line2 && <span className="sc-h1-white">{h1Line2}</span>}
+                {h1Line3 && <span className="sc-h1-outline">{h1Line3}</span>}
               </>
             ) : (
               <span style={{ color: "var(--sc-muted)", fontWeight: 300 }}>
@@ -206,12 +213,11 @@ function HomeComponent() {
             )}
           </h1>
 
-          {/* bio */}
-          {profile?.bio && (
+          {/* hero sub */}
+          {heroSubText && (
             <p className="sc-hero-sub">
-              <span className="sc-hi">Hello_World();</span>
-              <br />
-              {profile.bio}
+              {heroGreeting && <><span className="sc-hi">{heroGreeting}</span><br /></>}
+              {heroSubText}
             </p>
           )}
 
@@ -270,7 +276,7 @@ function HomeComponent() {
                 <span className="sc-tl-prompt">❯ </span>
                 <span className="sc-tl-cmd">whoami</span>
               </span>
-              <span className="sc-tl sc-tl-pink">{displayName || "Yamaterous"}</span>
+              <span className="sc-tl sc-tl-pink">{profile?.displayName || "Yamaterous"}</span>
               <span className="sc-tl">&nbsp;</span>
               <span className="sc-tl">
                 <span className="sc-tl-prompt">❯ </span>

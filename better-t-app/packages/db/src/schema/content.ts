@@ -17,6 +17,15 @@ export const profile = sqliteTable("profile", {
   githubUrl: text("github_url"),
   twitterUrl: text("twitter_url"),
   siteUrl: text("site_url"),
+  // ── サイト設定 ─────────────────────────────────────────────────────────
+  logoSubtitle: text("logo_subtitle").notNull().default("やまてろす・ハブ"),
+  heroTagline: text("hero_tagline").notNull().default("Portfolio · やまてろす"),
+  heroGreeting: text("hero_greeting").notNull().default("Hello_World();"),
+  h1Line1: text("h1_line1").notNull().default(""),
+  h1Line2: text("h1_line2").notNull().default("のポートフォリオ"),
+  h1Line3: text("h1_line3").notNull().default("hub."),
+  heroSubText: text("hero_sub_text").notNull().default(""),
+  // ────────────────────────────────────────────────────────────────────────
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),

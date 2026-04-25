@@ -1,9 +1,13 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
+import { orpc } from "@/utils/orpc";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
 export default function Header() {
+  const { data: profile } = useQuery(orpc.profile.get.queryOptions());
+  const logoSubtitle = profile?.logoSubtitle ?? "やまてろす・ハブ";
   return (
     <header
       style={{
@@ -49,7 +53,7 @@ export default function Header() {
             }}
             className="dark:!text-neutral-400"
           >
-            やまてろす・ハブ
+            {logoSubtitle}
           </span>
         </div>
       </Link>

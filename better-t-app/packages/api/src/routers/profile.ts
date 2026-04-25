@@ -16,6 +16,14 @@ const ProfileOutput = z.object({
   twitterUrl: z.string().nullable(),
   siteUrl: z.string().nullable(),
   updatedAt: z.string(),
+  // サイト設定
+  logoSubtitle: z.string(),
+  heroTagline: z.string(),
+  heroGreeting: z.string(),
+  h1Line1: z.string(),
+  h1Line2: z.string(),
+  h1Line3: z.string(),
+  heroSubText: z.string(),
 });
 
 const ProfileUpdateInput = z.object({
@@ -25,6 +33,14 @@ const ProfileUpdateInput = z.object({
   githubUrl: z.string().url().nullable().optional(),
   twitterUrl: z.string().url().nullable().optional(),
   siteUrl: z.string().url().nullable().optional(),
+  // サイト設定
+  logoSubtitle: z.string().max(60).optional(),
+  heroTagline: z.string().max(100).optional(),
+  heroGreeting: z.string().max(100).optional(),
+  h1Line1: z.string().max(60).optional(),
+  h1Line2: z.string().max(60).optional(),
+  h1Line3: z.string().max(60).optional(),
+  heroSubText: z.string().max(300).optional(),
 });
 
 function toOutput(row: typeof profile.$inferSelect) {
@@ -37,6 +53,14 @@ function toOutput(row: typeof profile.$inferSelect) {
     twitterUrl: row.twitterUrl ?? null,
     siteUrl: row.siteUrl ?? null,
     updatedAt: row.updatedAt.toISOString(),
+    // サイト設定
+    logoSubtitle: row.logoSubtitle,
+    heroTagline: row.heroTagline,
+    heroGreeting: row.heroGreeting,
+    h1Line1: row.h1Line1,
+    h1Line2: row.h1Line2,
+    h1Line3: row.h1Line3,
+    heroSubText: row.heroSubText,
   };
 }
 
@@ -61,16 +85,20 @@ export const profileRouter = {
       const updated = await db
         .update(profile)
         .set({
-          ...(input.displayName !== undefined && {
-            displayName: input.displayName,
-          }),
+          ...(input.displayName !== undefined && { displayName: input.displayName }),
           ...(input.bio !== undefined && { bio: input.bio }),
           ...(input.avatarUrl !== undefined && { avatarUrl: input.avatarUrl }),
           ...(input.githubUrl !== undefined && { githubUrl: input.githubUrl }),
-          ...(input.twitterUrl !== undefined && {
-            twitterUrl: input.twitterUrl,
-          }),
+          ...(input.twitterUrl !== undefined && { twitterUrl: input.twitterUrl }),
           ...(input.siteUrl !== undefined && { siteUrl: input.siteUrl }),
+          // サイト設定
+          ...(input.logoSubtitle !== undefined && { logoSubtitle: input.logoSubtitle }),
+          ...(input.heroTagline !== undefined && { heroTagline: input.heroTagline }),
+          ...(input.heroGreeting !== undefined && { heroGreeting: input.heroGreeting }),
+          ...(input.h1Line1 !== undefined && { h1Line1: input.h1Line1 }),
+          ...(input.h1Line2 !== undefined && { h1Line2: input.h1Line2 }),
+          ...(input.h1Line3 !== undefined && { h1Line3: input.h1Line3 }),
+          ...(input.heroSubText !== undefined && { heroSubText: input.heroSubText }),
           updatedAt: new Date(),
         })
         .where(eq(profile.id, current.id))

@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as WorksWorkIdRouteImport } from './routes/works/$workId'
+import { Route as AdminSiteRouteImport } from './routes/admin/site'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminWorksIndexRouteImport } from './routes/admin/works/index'
 import { Route as AdminWorksNewRouteImport } from './routes/admin/works/new'
@@ -56,6 +57,11 @@ const WorksWorkIdRoute = WorksWorkIdRouteImport.update({
   path: '/works/$workId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSiteRoute = AdminSiteRouteImport.update({
+  id: '/site',
+  path: '/site',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProfileRoute = AdminProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/site': typeof AdminSiteRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
   '/works/': typeof WorksIndexRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/site': typeof AdminSiteRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin': typeof AdminIndexRoute
   '/works': typeof WorksIndexRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/site': typeof AdminSiteRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
   '/works/': typeof WorksIndexRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/admin-login-hub'
     | '/dashboard'
     | '/admin/profile'
+    | '/admin/site'
     | '/works/$workId'
     | '/admin/'
     | '/works/'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/admin-login-hub'
     | '/dashboard'
     | '/admin/profile'
+    | '/admin/site'
     | '/works/$workId'
     | '/admin'
     | '/works'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/admin-login-hub'
     | '/dashboard'
     | '/admin/profile'
+    | '/admin/site'
     | '/works/$workId'
     | '/admin/'
     | '/works/'
@@ -217,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorksWorkIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/site': {
+      id: '/admin/site'
+      path: '/site'
+      fullPath: '/admin/site'
+      preLoaderRoute: typeof AdminSiteRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/profile': {
       id: '/admin/profile'
       path: '/profile'
@@ -250,6 +269,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
+  AdminSiteRoute: typeof AdminSiteRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminWorksNewRoute: typeof AdminWorksNewRoute
   AdminWorksIndexRoute: typeof AdminWorksIndexRoute
@@ -258,6 +278,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
+  AdminSiteRoute: AdminSiteRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminWorksNewRoute: AdminWorksNewRoute,
   AdminWorksIndexRoute: AdminWorksIndexRoute,
