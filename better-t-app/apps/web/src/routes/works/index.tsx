@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { orpc } from "@/utils/orpc";
+import { client, orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/works/")({
   component: WorksPage,
@@ -10,6 +10,10 @@ export const Route = createFileRoute("/works/")({
 function WorksPage() {
   const { data: works = [], isLoading } = useQuery(orpc.works.list.queryOptions());
   const navigate = useNavigate();
+  const { mutate: trackClick } = useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      client.analytics.trackClick({ eventType: "work_click", targetId: id, targetTitle: title }),
+  });
 
   return (
     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem clamp(1rem, 4vw, 2rem)" }}>
@@ -86,7 +90,10 @@ function WorksPage() {
             // biome-ignore lint/a11y/useKeyWithClickEvents: カード全体をクリックで詳細遷移
             <div
               key={w.id}
-              onClick={() => navigate({ to: "/works/$workId", params: { workId: w.id } })}
+              onClick={() => {
+                trackClick({ id: w.id, title: w.title });
+                navigate({ to: "/works/$workId", params: { workId: w.id } });
+              }}
               style={{ textDecoration: "none", cursor: "pointer" }}
             >
               <article

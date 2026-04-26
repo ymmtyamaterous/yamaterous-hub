@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { orpc } from "@/utils/orpc";
+import { client, orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndexPage,
@@ -26,6 +26,11 @@ function BlogIndexPage() {
   );
 
   const { data: categories = [] } = useQuery(orpc.categories.list.queryOptions());
+
+  const { mutate: trackClick } = useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      client.analytics.trackClick({ eventType: "post_click", targetId: id, targetTitle: title }),
+  });
 
   return (
     <div
@@ -219,6 +224,7 @@ function BlogIndexPage() {
               to="/blog/$slug"
               params={{ slug: post.slug }}
               style={{ textDecoration: "none" }}
+              onClick={() => trackClick({ id: post.id, title: post.title })}
             >
               <article
                 style={{

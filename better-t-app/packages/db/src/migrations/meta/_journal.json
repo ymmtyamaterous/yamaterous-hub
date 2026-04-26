@@ -43,6 +43,13 @@
       "when": 1777250000000,
       "tag": "0005_post_category",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1777300000000,
+      "tag": "0006_analytics",
+      "breakpoints": true
     }
   ]
 }

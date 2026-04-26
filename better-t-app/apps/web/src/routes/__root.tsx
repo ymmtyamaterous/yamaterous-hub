@@ -3,16 +3,16 @@ import { Toaster } from "@better-t-app/ui/components/sonner";
 import { createORPCClient } from "@orpc/client";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { QueryClient } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import { HeadContent, Outlet, createRootRouteWithContext, useLocation } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
-import { link, orpc } from "@/utils/orpc";
+import { client, link, orpc } from "@/utils/orpc";
 
 import "../index.css";
 
@@ -51,6 +51,28 @@ function SiteThemeApplier() {
   return null;
 }
 
+function PageViewTracker() {
+  const location = useLocation();
+  const { mutate } = useMutation({
+    mutationFn: (path: string) =>
+      client.analytics.trackPageView({
+        path,
+        referrer: document.referrer || null,
+        userAgent: navigator.userAgent.slice(0, 512),
+      }),
+  });
+  const lastPath = useRef<string | null>(null);
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === lastPath.current) return;
+    lastPath.current = path;
+    mutate(path);
+  }, [location.pathname, mutate]);
+
+  return null;
+}
+
 function RootComponent() {
   const [client] = useState<AppRouterClient>(() => createORPCClient(link));
   const [orpcUtils] = useState(() => createTanstackQueryUtils(client));
@@ -66,6 +88,8 @@ function RootComponent() {
       >
         {/* サイトテーマ適用 */}
         <SiteThemeApplier />
+        {/* ページビュートラッキング */}
+        <PageViewTracker />
         {/* 背景エフェクト */}
         <div className="sc-grid-bg" />
         <div className="sc-glow-blob sc-gb1" />

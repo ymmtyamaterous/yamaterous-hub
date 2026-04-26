@@ -27,6 +27,7 @@ const { call } = await import("@orpc/server");
 const { profileRouter } = await import("@better-t-app/api/routers/profile");
 const { worksRouter } = await import("@better-t-app/api/routers/works");
 const { tagsRouter } = await import("@better-t-app/api/routers/tags");
+const { analyticsRouter } = await import("@better-t-app/api/routers/analytics");
 
 const authCtx = { context: { session: { user: { id: "user-1", name: "Test" } } } };
 const publicCtx = { context: {} };
@@ -36,6 +37,8 @@ beforeEach(async () => {
   await testDb.delete(schema.work);
   await testDb.delete(schema.tag);
   await testDb.delete(schema.profile);
+  await testDb.delete(schema.clickEvent);
+  await testDb.delete(schema.pageView);
 });
 
 describe("profileRouter", () => {
@@ -114,3 +117,54 @@ describe("worksRouter", () => {
     await expect(call(worksRouter.getById, { id: "private-w" }, publicCtx)).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 });
+
+describe("analyticsRouter", () => {
+  test("trackPageView: ページビューを記録できる", async () => {
+    const result = await call(
+      analyticsRouter.trackPageView,
+      { path: "/works", referrer: null },
+      publicCtx,
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  test("trackClick: クリックイベントを記録できる", async () => {
+    const result = await call(
+      analyticsRouter.trackClick,
+      { eventType: "work_click", targetId: "work-1", targetTitle: "テスト作品" },
+      publicCtx,
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  test("getStats: 統計を取得できる（認証あり）", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackClick, { eventType: "work_click", targetId: "w1", targetTitle: "作品A" }, publicCtx);
+    await call(analyticsRouter.trackClick, { eventType: "post_click", targetId: "p1", targetTitle: "記事A" }, publicCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(2);
+    expect(stats.topPaths).toHaveLength(2);
+    expect(stats.topWorkClicks[0].targetTitle).toBe("作品A");
+    expect(stats.topPostClicks[0].targetTitle).toBe("記事A");
+  });
+
+  test("getStats: 認証なしは UNAUTHORIZED を投げる", async () => {
+    await expect(call(analyticsRouter.getStats, undefined, publicCtx)).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+  });
+
+  test("trackPageView: 同じパスを複数記録できる", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(3);
+    expect(stats.topPaths[0].path).toBe("/works");
+    expect(stats.topPaths[0].count).toBe(3);
+  });
+});
+
