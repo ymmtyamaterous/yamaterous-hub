@@ -189,3 +189,41 @@ export const postCategoryRelations = relations(postCategory, ({ one }) => ({
     references: [category.id],
   }),
 }));
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+
+export const pageView = sqliteTable(
+  "page_view",
+  {
+    id: text("id").primaryKey(),
+    path: text("path").notNull(),
+    referrer: text("referrer"),
+    ipHash: text("ip_hash"),
+    userAgent: text("user_agent"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("page_view_path_idx").on(table.path),
+    index("page_view_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const clickEvent = sqliteTable(
+  "click_event",
+  {
+    id: text("id").primaryKey(),
+    eventType: text("event_type").notNull(), // 'work_click' | 'post_click'
+    targetId: text("target_id").notNull(),
+    targetTitle: text("target_title").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("click_event_type_idx").on(table.eventType),
+    index("click_event_target_id_idx").on(table.targetId),
+    index("click_event_created_at_idx").on(table.createdAt),
+  ],
+);

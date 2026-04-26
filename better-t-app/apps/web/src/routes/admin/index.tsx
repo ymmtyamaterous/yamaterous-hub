@@ -7,21 +7,181 @@ export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
 });
 
+// ── 小コンポーネント ──────────────────────────────────────────────────────────
+
+function StatCard({
+  label,
+  value,
+  color,
+  sub,
+}: {
+  label: string;
+  value: number | string;
+  color: string;
+  sub?: string;
+}) {
+  return (
+    <div
+      style={{
+        background: "rgba(253,246,239,0.9)",
+        border: "1px solid rgba(200,0,90,0.12)",
+        borderRadius: "4px",
+        padding: "1.25rem 1.5rem",
+        boxShadow: "0 2px 8px rgba(200,0,90,0.04)",
+      }}
+      className="dark:!bg-neutral-800/80 dark:!border-pink-900/20"
+    >
+      <div
+        style={{
+          fontFamily: "var(--sc-font-mono)",
+          fontSize: "10px",
+          letterSpacing: "0.15em",
+          color: "var(--sc-muted)",
+          marginBottom: "0.4rem",
+        }}
+        className="dark:!text-neutral-500"
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontFamily: "var(--sc-font-mono)",
+          fontSize: "2.2rem",
+          fontWeight: 700,
+          color,
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+      {sub && (
+        <div
+          style={{
+            fontFamily: "var(--sc-font-mono)",
+            fontSize: "10px",
+            color: "var(--sc-muted)",
+            marginTop: "0.3rem",
+          }}
+          className="dark:!text-neutral-500"
+        >
+          {sub}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RankingTable({
+  title,
+  rows,
+  labelKey,
+  countKey,
+}: {
+  title: string;
+  rows: Record<string, unknown>[];
+  labelKey: string;
+  countKey: string;
+}) {
+  return (
+    <div>
+      <h2
+        style={{
+          fontFamily: "var(--sc-font-mono)",
+          fontSize: "11px",
+          letterSpacing: "0.15em",
+          color: "var(--sc-sakura)",
+          marginBottom: "0.75rem",
+        }}
+      >
+        {title}
+      </h2>
+      <div
+        style={{
+          background: "rgba(253,246,239,0.9)",
+          border: "1px solid rgba(200,0,90,0.12)",
+          borderRadius: "4px",
+          overflow: "hidden",
+        }}
+        className="dark:!bg-neutral-800/80 dark:!border-pink-900/20"
+      >
+        {rows.length === 0 ? (
+          <div
+            style={{
+              padding: "1.5rem",
+              textAlign: "center",
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "12px",
+              color: "var(--sc-muted)",
+            }}
+          >
+            データなし
+          </div>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {rows.map((row, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: ランキング行はインデックスで管理
+                <tr
+                  key={i}
+                  style={{ borderBottom: "1px solid rgba(200,0,90,0.06)" }}
+                >
+                  <td
+                    style={{
+                      padding: "0.6rem 1rem",
+                      fontFamily: "var(--sc-font-mono)",
+                      fontSize: "11px",
+                      color: "var(--sc-muted)",
+                      width: "2rem",
+                    }}
+                    className="dark:!text-neutral-500"
+                  >
+                    {i + 1}
+                  </td>
+                  <td
+                    style={{
+                      padding: "0.6rem 0.5rem",
+                      fontFamily: "var(--sc-font-jp)",
+                      fontSize: "13px",
+                      color: "var(--sc-text)",
+                      wordBreak: "break-all",
+                    }}
+                    className="dark:!text-neutral-200"
+                  >
+                    {String(row[labelKey])}
+                  </td>
+                  <td
+                    style={{
+                      padding: "0.6rem 1rem",
+                      fontFamily: "var(--sc-font-mono)",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "var(--sc-cyber)",
+                      textAlign: "right",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {String(row[countKey])}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── メインコンポーネント ──────────────────────────────────────────────────────
+
 function AdminDashboard() {
   const { data: works = [] } = useQuery(orpc.works.adminList.queryOptions());
+  const { data: analytics, isLoading: analyticsLoading } = useQuery(
+    orpc.analytics.getStats.queryOptions(),
+  );
 
   const totalWorks = works.length;
   const publishedWorks = works.filter((w) => w.isPublished).length;
-
-  const stats = [
-    { label: "作品数", value: totalWorks, color: "var(--sc-cyber)" },
-    { label: "公開中", value: publishedWorks, color: "var(--sc-sakura)" },
-    {
-      label: "非公開",
-      value: totalWorks - publishedWorks,
-      color: "var(--sc-muted)",
-    },
-  ];
 
   return (
     <div>
@@ -49,55 +209,119 @@ function AdminDashboard() {
         ダッシュボード
       </h1>
 
-      {/* 統計カード */}
+      {/* ── コンテンツ統計 ── */}
+      <div
+        style={{
+          fontFamily: "var(--sc-font-mono)",
+          fontSize: "11px",
+          letterSpacing: "0.15em",
+          color: "var(--sc-sakura)",
+          marginBottom: "0.75rem",
+        }}
+      >
+        // CONTENT
+      </div>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
           gap: "1rem",
-          marginBottom: "3rem",
+          marginBottom: "2.5rem",
         }}
       >
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            style={{
-              background: "rgba(253,246,239,0.9)",
-              border: "1px solid rgba(200,0,90,0.12)",
-              borderRadius: "4px",
-              padding: "1.5rem",
-              boxShadow: "0 2px 8px rgba(200,0,90,0.04)",
-            }}
-            className="dark:!bg-neutral-800/80 dark:!border-pink-900/20"
-          >
-            <div
-              style={{
-                fontFamily: "var(--sc-font-mono)",
-                fontSize: "10px",
-                letterSpacing: "0.15em",
-                color: "var(--sc-muted)",
-                marginBottom: "0.5rem",
-              }}
-              className="dark:!text-neutral-500"
-            >
-              {s.label}
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--sc-font-mono)",
-                fontSize: "2.5rem",
-                fontWeight: 700,
-                color: s.color,
-                lineHeight: 1,
-              }}
-            >
-              {s.value}
-            </div>
-          </div>
-        ))}
+        <StatCard label="作品数" value={totalWorks} color="var(--sc-cyber)" />
+        <StatCard label="公開中" value={publishedWorks} color="var(--sc-sakura)" />
+        <StatCard
+          label="非公開"
+          value={totalWorks - publishedWorks}
+          color="var(--sc-muted)"
+        />
       </div>
 
-      {/* 最近の作品 */}
+      {/* ── アクセス統計 ── */}
+      <div
+        style={{
+          fontFamily: "var(--sc-font-mono)",
+          fontSize: "11px",
+          letterSpacing: "0.15em",
+          color: "var(--sc-sakura)",
+          marginBottom: "0.75rem",
+        }}
+      >
+        // ACCESS METRICS
+      </div>
+      {analyticsLoading ? (
+        <div
+          style={{
+            fontFamily: "var(--sc-font-mono)",
+            fontSize: "12px",
+            color: "var(--sc-muted)",
+            marginBottom: "2.5rem",
+          }}
+        >
+          Loading...
+        </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+              gap: "1rem",
+              marginBottom: "2.5rem",
+            }}
+          >
+            <StatCard
+              label="総PV数"
+              value={analytics?.totalPageViews ?? 0}
+              color="var(--sc-cyber)"
+            />
+            <StatCard
+              label="今日のPV"
+              value={analytics?.todayPageViews ?? 0}
+              color="var(--sc-sakura)"
+              sub="過去24時間"
+            />
+            <StatCard
+              label="今週のPV"
+              value={analytics?.weekPageViews ?? 0}
+              color="var(--sc-muted)"
+              sub="過去7日間"
+            />
+          </div>
+
+          {/* ランキング */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))",
+              gap: "2rem",
+              marginBottom: "3rem",
+            }}
+          >
+            <RankingTable
+              title="// TOP PAGES"
+              rows={(analytics?.topPaths ?? []) as Record<string, unknown>[]}
+              labelKey="path"
+              countKey="count"
+            />
+            <RankingTable
+              title="// TOP WORK CLICKS"
+              rows={(analytics?.topWorkClicks ?? []) as Record<string, unknown>[]}
+              labelKey="targetTitle"
+              countKey="count"
+            />
+            <RankingTable
+              title="// TOP POST CLICKS"
+              rows={(analytics?.topPostClicks ?? []) as Record<string, unknown>[]}
+              labelKey="targetTitle"
+              countKey="count"
+            />
+          </div>
+        </>
+      )}
+
+      {/* ── 最近の作品 ── */}
       <div>
         <div
           style={{
