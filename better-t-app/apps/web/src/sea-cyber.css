@@ -172,11 +172,59 @@
   100% { transform: translate3d(85px, 0, 0); }
 }
 
-/* ── ターミナルカーソル ── */
-[data-site-theme="sea-cyber"] .sc-cursor-blink {
-  background: #00bfff;
-  box-shadow: 0 0 8px #00bfff;
+/* ── ターミナル内テキスト色（light glassmorphism 向け） ── */
+[data-site-theme="sea-cyber"] .sc-tl-prompt { color: #00668a; }
+[data-site-theme="sea-cyber"] .sc-tl-cmd    { color: #171c1e; }
+[data-site-theme="sea-cyber"] .sc-tl-out    { color: #3d4850; }
+[data-site-theme="sea-cyber"] .sc-tl-cyan   { color: #006a62; }
+[data-site-theme="sea-cyber"] .sc-tl-pink   { color: #00668a; }
+[data-site-theme="sea-cyber"] .sc-tl-green  { color: #005049; }
+
+/* ── ターミナルドット（sea-cyber カラー） ── */
+[data-site-theme="sea-cyber"] .sc-td1 { background: #ba1a1a; box-shadow: 0 0 6px #ba1a1a; }
+[data-site-theme="sea-cyber"] .sc-td2 { background: #705d00; box-shadow: 0 0 6px #705d00; }
+[data-site-theme="sea-cyber"] .sc-td3 { background: #006a62; box-shadow: 0 0 6px #006a62; }
+
+/* ── ターミナルタイトル ── */
+[data-site-theme="sea-cyber"] .sc-term-title { color: #6d7981; }
+
+/* ── hero sub テキストの左ボーダー ── */
+[data-site-theme="sea-cyber"] .sc-hero-sub {
+  border-left-color: rgba(0, 102, 138, 0.35);
 }
+
+/* ── ディバイダー ── */
+[data-site-theme="sea-cyber"] .sc-sakura-divider {
+  color: rgba(0, 102, 138, 0.35);
+  border-top-color: rgba(0, 102, 138, 0.12);
+  border-bottom-color: rgba(0, 102, 138, 0.12);
+  background: var(--sc-bg2);
+}
+[data-site-theme="sea-cyber"] .sc-sakura-divider::before {
+  background: linear-gradient(90deg, transparent, rgba(0,191,255,0.06), transparent);
+}
+
+/* ── vline ── */
+[data-site-theme="sea-cyber"] .sc-vline {
+  background: linear-gradient(180deg, transparent 0%, #00bfff 40%, #006a62 70%, transparent 100%);
+}
+
+/* ── wave SVG アニメーション ── */
+[data-site-theme="sea-cyber"] .sc-waves {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use {
+  animation: sc-wave-move 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+}
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
 
 /* ── sys dot ── */
 [data-site-theme="sea-cyber"] .sc-sys-dot {
