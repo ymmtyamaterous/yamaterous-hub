@@ -25,6 +25,7 @@ export const profile = sqliteTable("profile", {
   h1Line2: text("h1_line2").notNull().default("のポートフォリオ"),
   h1Line3: text("h1_line3").notNull().default("hub."),
   heroSubText: text("hero_sub_text").notNull().default(""),
+  theme: text("theme").notNull().default("sakura-cyber"),
   // ────────────────────────────────────────────────────────────────────────
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;700;900&family=Share+Tech+Mono&display=swap");
 @import "@better-t-app/ui/globals.css";
+@import "./sea-cyber.css";
 
 /* ── Sakura-Cyber Design Tokens ─────────────────────────────────────────── */
 :root {

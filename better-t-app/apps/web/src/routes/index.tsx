@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
+import { SeaCyberHome } from "@/components/sea-cyber-home";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/")({
@@ -9,6 +10,17 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
+  const profileQuery = useQuery(orpc.profile.get.queryOptions());
+  const profile = profileQuery.data;
+
+  if (profile?.theme === "sea-cyber") {
+    return <SeaCyberHome />;
+  }
+
+  return <SakuraCyberHome />;
+}
+
+function SakuraCyberHome() {
   const profileQuery = useQuery(orpc.profile.get.queryOptions());
   const worksQuery = useQuery(orpc.works.list.queryOptions());
   const canvasRef = useRef<HTMLCanvasElement>(null);

@@ -3,10 +3,11 @@ import { Toaster } from "@better-t-app/ui/components/sonner";
 import { createORPCClient } from "@orpc/client";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { QueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Footer from "@/components/footer";
 import Header from "@/components/header";
@@ -41,6 +42,15 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
 });
 
+function SiteThemeApplier() {
+  const { data: profile } = useQuery(orpc.profile.get.queryOptions());
+  useEffect(() => {
+    const theme = profile?.theme ?? "sakura-cyber";
+    document.documentElement.setAttribute("data-site-theme", theme);
+  }, [profile?.theme]);
+  return null;
+}
+
 function RootComponent() {
   const [client] = useState<AppRouterClient>(() => createORPCClient(link));
   const [orpcUtils] = useState(() => createTanstackQueryUtils(client));
@@ -54,6 +64,8 @@ function RootComponent() {
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
+        {/* サイトテーマ適用 */}
+        <SiteThemeApplier />
         {/* 背景エフェクト */}
         <div className="sc-grid-bg" />
         <div className="sc-glow-blob sc-gb1" />

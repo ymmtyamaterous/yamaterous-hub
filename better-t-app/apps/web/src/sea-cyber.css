@@ -1,0 +1,236 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Sea-Cyber Light テーマ
+   data-theme="sea-cyber" が <html> に付いているときのみ有効
+   ───────────────────────────────────────────────────────────────────────── */
+
+[data-site-theme="sea-cyber"] {
+  /* ── デザイントークン ── */
+  --sc-bg:      #f5fafc;
+  --sc-bg2:     #eff4f6;
+  --sc-sakura:  #00668a;   /* primary */
+  --sc-sakura2: #004a65;
+  --sc-sakura3: #00bfff;
+  --sc-cyber:   #006a62;   /* secondary */
+  --sc-cyber2:  #705d00;   /* tertiary */
+  --sc-cyber3:  #005049;
+  --sc-neon-y:  #705d00;
+  --sc-text:    #171c1e;
+  --sc-muted:   #3d4850;
+  --sc-surface: rgba(0, 102, 138, 0.05);
+  --sc-glow-pink: 0 0 10px rgba(0, 191, 255, 0.3);
+  --sc-glow-cyan: 0 0 10px rgba(0, 106, 98, 0.2);
+  --sc-font-jp:   "Plus Jakarta Sans", sans-serif;
+  --sc-font-mono: "Share Tech Mono", monospace;
+
+  /* ── 背景色 ── */
+  background-color: #f5fafc;
+  color: #171c1e;
+}
+
+/* scanline は sea-cyber では薄い水色系に変更 */
+[data-site-theme="sea-cyber"] body::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 191, 255, 0.025) 3px,
+    rgba(0, 191, 255, 0.025) 4px
+  );
+}
+
+/* grid background */
+[data-site-theme="sea-cyber"] .sc-grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 102, 138, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 102, 138, 0.06) 1px, transparent 1px);
+}
+
+/* glow blobs */
+[data-site-theme="sea-cyber"] .sc-gb1 {
+  background: rgba(0, 191, 255, 0.2);
+}
+[data-site-theme="sea-cyber"] .sc-gb2 {
+  background: rgba(94, 246, 230, 0.15);
+}
+[data-site-theme="sea-cyber"] .sc-gb3 {
+  background: rgba(0, 102, 138, 0.12);
+}
+
+/* ── ヘッダー ── */
+[data-site-theme="sea-cyber"] header {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 24px rgba(0, 191, 255, 0.08);
+}
+
+/* ── グラスカード ── */
+[data-site-theme="sea-cyber"] .sc-terminal {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 191, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-site-theme="sea-cyber"] .sc-term-bar {
+  background: rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-site-theme="sea-cyber"] .sc-term-body {
+  background: rgba(255, 255, 255, 0.1);
+  color: #3d4850;
+}
+
+/* ── h1 グリッチ色変更 ── */
+[data-site-theme="sea-cyber"] .sc-h1-cyber {
+  color: var(--sc-sakura);
+  text-shadow: 0 0 20px rgba(0, 191, 255, 0.4);
+}
+[data-site-theme="sea-cyber"] .sc-h1-cyber::before {
+  color: var(--sc-cyber);
+}
+[data-site-theme="sea-cyber"] .sc-h1-cyber::after {
+  color: #3adccc;
+}
+[data-site-theme="sea-cyber"] .sc-h1-outline {
+  -webkit-text-stroke: 2px var(--sc-cyber);
+}
+
+/* ── ボタン ── */
+[data-site-theme="sea-cyber"] .sc-btn-sakura {
+  background: linear-gradient(135deg, #00bfff 0%, #5ef6e6 100%);
+  box-shadow: 0 4px 16px rgba(0, 191, 255, 0.3);
+}
+[data-site-theme="sea-cyber"] .sc-btn-sakura::before {
+  background: linear-gradient(135deg, #5ef6e6 0%, #00bfff 100%);
+}
+[data-site-theme="sea-cyber"] .sc-btn-ghost {
+  border-color: rgba(0, 102, 138, 0.4);
+  color: var(--sc-sakura);
+  background: rgba(0, 102, 138, 0.05);
+}
+[data-site-theme="sea-cyber"] .sc-btn-ghost:hover {
+  border-color: var(--sc-sakura);
+  background: rgba(0, 102, 138, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 102, 138, 0.15);
+}
+
+/* ── 桜ディバイダー → 波ディバイダー ── */
+[data-site-theme="sea-cyber"] .sc-sakura-divider {
+  letter-spacing: 1em;
+  opacity: 0.5;
+  filter: hue-rotate(180deg);
+}
+
+/* ── ワークカード ── */
+[data-site-theme="sea-cyber"] .sc-wk-card {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 191, 255, 0.08);
+}
+[data-site-theme="sea-cyber"] .sc-wk-card:hover {
+  border-color: rgba(0, 191, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 191, 255, 0.15);
+}
+
+/* ── タグ ── */
+[data-site-theme="sea-cyber"] .sc-tag {
+  border-color: rgba(0, 102, 138, 0.35);
+  background: rgba(0, 102, 138, 0.07);
+  color: var(--sc-sakura);
+}
+
+/* ── セクションタグ ── */
+[data-site-theme="sea-cyber"] .sc-s-tag {
+  border-color: rgba(0, 102, 138, 0.3);
+  background: rgba(0, 102, 138, 0.06);
+  color: var(--sc-sakura);
+}
+
+/* ── Wave アニメーション（hero 背景） ── */
+[data-site-theme="sea-cyber"] .sc-waves {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use {
+  animation: sc-wave-move 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+}
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+[data-site-theme="sea-cyber"] .sc-waves .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+@keyframes sc-wave-move {
+  0%   { transform: translate3d(-90px, 0, 0); }
+  100% { transform: translate3d(85px, 0, 0); }
+}
+
+/* ── ターミナルカーソル ── */
+[data-site-theme="sea-cyber"] .sc-cursor-blink {
+  background: #00bfff;
+  box-shadow: 0 0 8px #00bfff;
+}
+
+/* ── sys dot ── */
+[data-site-theme="sea-cyber"] .sc-sys-dot {
+  background: var(--sc-cyber);
+  box-shadow: 0 0 6px var(--sc-cyber);
+}
+
+/* ── scanline ターミナル ── */
+[data-site-theme="sea-cyber"] .sc-term-scanline::after {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* ── works セクション背景 ── */
+[data-site-theme="sea-cyber"] .sc-works-section {
+  background: #eff4f6 !important;
+  border-top-color: rgba(0, 102, 138, 0.1) !important;
+}
+
+/* ── ヘッダーロゴ色 ── */
+[data-site-theme="sea-cyber"] .sc-logo-primary {
+  color: var(--sc-sakura) !important;
+  text-shadow: 0 0 10px rgba(0, 191, 255, 0.3) !important;
+}
+
+/* ── フッター ── */
+[data-site-theme="sea-cyber"] footer {
+  background: #eff4f6 !important;
+  border-top-color: rgba(0, 102, 138, 0.15) !important;
+}
+
+/* ── hero terminal float ── */
+[data-site-theme="sea-cyber"] .sc-terminal {
+  animation: sc-sea-term-float 6s ease-in-out infinite !important;
+}
+@keyframes sc-sea-term-float {
+  0%, 100% { transform: translateY(0) rotateX(1deg); }
+  50%       { transform: translateY(-15px) rotateX(-1deg); }
+}
+
+/* ── カスタムカーソル ── */
+[data-site-theme="sea-cyber"] .sc-cur {
+  background: #00bfff !important;
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.4) !important;
+}
+[data-site-theme="sea-cyber"] .sc-cur.big {
+  background: rgba(0, 191, 255, 0.1) !important;
+  border-color: #00bfff !important;
+}
+[data-site-theme="sea-cyber"] .sc-cur-trail {
+  border-color: rgba(0, 191, 255, 0.3) !important;
+}
