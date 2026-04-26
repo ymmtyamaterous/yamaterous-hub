@@ -426,8 +426,69 @@ body::after {
   transform: none;
 }
 
+/* ── Nav show/hide helpers ── */
+.sc-nav-desktop { display: flex; }
+.sc-nav-mobile-btn { display: none; }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .sc-hero-terminal { display: none; }
   .sc-hero { padding: 100px 1.5rem 3rem; }
+}
+
+/* タッチデバイスではカスタムカーソル非表示 */
+@media (pointer: coarse) {
+  .sc-cur, .sc-cur-trail { display: none; }
+}
+
+/* ── Admin サイドバー ── */
+.sc-admin-sidebar-desktop { display: block; }
+.sc-admin-mobile-header { display: none; }
+
+@media (max-width: 768px) {
+  /* ── ヘッダーナビ切り替え ── */
+  .sc-nav-desktop { display: none !important; }
+  .sc-nav-mobile-btn { display: flex !important; }
+
+  /* ── ヒーロー ── */
+  .sc-hero {
+    padding: 88px 1.25rem 2.5rem;
+    min-height: auto;
+  }
+  .sc-h1 {
+    font-size: clamp(2rem, 10vw, 3.2rem);
+  }
+  .sc-hero-sub {
+    font-size: 13px;
+    margin: 1.25rem 0 1.75rem;
+  }
+  .sc-hero-cta {
+    gap: 0.6rem;
+  }
+  .sc-btn {
+    padding: 0.65rem 1.25rem;
+    font-size: 10px;
+  }
+
+  /* ── Works グリッド ── */
+  .sc-works-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── カスタムカーソル非表示 ── */
+  .sc-cur, .sc-cur-trail { display: none; }
+
+  /* ── Admin サイドバー ── */
+  .sc-admin-sidebar-desktop { display: none !important; }
+  .sc-admin-mobile-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(247,237,227,0.9);
+    border-bottom: 1px solid rgba(200,0,90,0.1);
+    position: sticky;
+    top: 72px;
+    z-index: 100;
+    width: 100%;
+  }
 }

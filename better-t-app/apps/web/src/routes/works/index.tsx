@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { orpc } from "@/utils/orpc";
 
@@ -9,9 +9,10 @@ export const Route = createFileRoute("/works/")({
 
 function WorksPage() {
   const { data: works = [], isLoading } = useQuery(orpc.works.list.queryOptions());
+  const navigate = useNavigate();
 
   return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem 2rem" }}>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem clamp(1rem, 4vw, 2rem)" }}>
       {/* ページタイトル */}
       <div style={{ marginBottom: "3rem" }}>
         <div
@@ -77,16 +78,16 @@ function WorksPage() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))",
             gap: "1.5rem",
           }}
         >
           {works.map((w) => (
-            <Link
+            // biome-ignore lint/a11y/useKeyWithClickEvents: カード全体をクリックで詳細遷移
+            <div
               key={w.id}
-              to="/works/$workId"
-              params={{ workId: w.id }}
-              style={{ textDecoration: "none" }}
+              onClick={() => navigate({ to: "/works/$workId", params: { workId: w.id } })}
+              style={{ textDecoration: "none", cursor: "pointer" }}
             >
               <article
                 style={{
@@ -223,7 +224,7 @@ function WorksPage() {
                   </div>
                 </div>
               </article>
-            </Link>
+            </div>
           ))}
         </div>
       )}

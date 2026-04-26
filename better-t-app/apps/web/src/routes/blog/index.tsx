@@ -32,7 +32,7 @@ function BlogIndexPage() {
       style={{
         maxWidth: "800px",
         margin: "0 auto",
-        padding: "3rem 1.5rem",
+        padding: "3rem clamp(1rem, 4vw, 1.5rem)",
       }}
     >
       {/* ヘッダー */}

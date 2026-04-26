@@ -19,7 +19,7 @@ function WorkDetailPage() {
         style={{
           maxWidth: "800px",
           margin: "0 auto",
-          padding: "3rem 2rem",
+          padding: "3rem clamp(1rem, 4vw, 2rem)",
           fontFamily: "var(--sc-font-mono)",
           color: "var(--sc-muted)",
           fontSize: "13px",
@@ -36,7 +36,7 @@ function WorkDetailPage() {
         style={{
           maxWidth: "800px",
           margin: "0 auto",
-          padding: "3rem 2rem",
+          padding: "3rem clamp(1rem, 4vw, 2rem)",
           fontFamily: "var(--sc-font-mono)",
           color: "var(--sc-cyber3)",
           fontSize: "13px",
@@ -51,7 +51,7 @@ function WorkDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "3rem 2rem" }}>
+    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "3rem clamp(1rem, 4vw, 2rem)" }}>
       {/* 戻るリンク */}
       <Link
         to="/works"

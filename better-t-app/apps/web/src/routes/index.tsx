@@ -334,7 +334,7 @@ function SakuraCyberHome() {
       {featuredWorks.length > 0 && (
         <section
           style={{
-            padding: "6rem 3rem",
+            padding: "clamp(3rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem)",
             background: "var(--sc-bg2)",
             borderTop: "1px solid rgba(200,0,90,0.1)",
             position: "relative",
@@ -348,6 +348,8 @@ function SakuraCyberHome() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "baseline",
+                flexWrap: "wrap",
+                gap: "0.75rem",
                 marginBottom: "3rem",
               }}
             >

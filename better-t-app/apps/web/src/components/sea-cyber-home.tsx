@@ -239,7 +239,7 @@ export function SeaCyberHome() {
         <section
           className="sc-works-section"
           style={{
-            padding: "6rem 3rem",
+            padding: "clamp(3rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem)",
             background: "var(--sc-bg2)",
             borderTop: "1px solid rgba(0,102,138,0.1)",
             position: "relative",
@@ -248,7 +248,7 @@ export function SeaCyberHome() {
         >
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <div className="sc-s-tag sc-reveal">Selected Projects</div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "3rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: "0.75rem", marginBottom: "3rem" }}>
               <h2
                 className="sc-reveal"
                 style={{
