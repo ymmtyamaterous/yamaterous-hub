@@ -24,7 +24,7 @@ const ProfileOutput = z.object({
   h1Line2: z.string(),
   h1Line3: z.string(),
   heroSubText: z.string(),
-  theme: z.enum(["sakura-cyber", "sea-cyber"]),
+  theme: z.enum(["sakura-cyber", "sea-cyber", "autumn-cyber"]),
 });
 
 const ProfileUpdateInput = z.object({
@@ -42,7 +42,7 @@ const ProfileUpdateInput = z.object({
   h1Line2: z.string().max(60).optional(),
   h1Line3: z.string().max(60).optional(),
   heroSubText: z.string().max(300).optional(),
-  theme: z.enum(["sakura-cyber", "sea-cyber"]).optional(),
+  theme: z.enum(["sakura-cyber", "sea-cyber", "autumn-cyber"]).optional(),
 });
 
 function toOutput(row: typeof profile.$inferSelect) {
@@ -63,7 +63,7 @@ function toOutput(row: typeof profile.$inferSelect) {
     h1Line2: row.h1Line2,
     h1Line3: row.h1Line3,
     heroSubText: row.heroSubText,
-    theme: (row.theme === "sea-cyber" ? "sea-cyber" : "sakura-cyber") as "sakura-cyber" | "sea-cyber",
+    theme: (["sakura-cyber", "sea-cyber", "autumn-cyber"].includes(row.theme) ? row.theme : "sakura-cyber") as "sakura-cyber" | "sea-cyber" | "autumn-cyber",
   };
 }
 

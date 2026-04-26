@@ -71,7 +71,7 @@ function Field({
   );
 }
 
-type ThemeId = "sakura-cyber" | "sea-cyber";
+type ThemeId = "sakura-cyber" | "sea-cyber" | "autumn-cyber";
 
 const THEMES: { id: ThemeId; label: string; desc: string; colors: string[] }[] = [
   {
@@ -85,6 +85,12 @@ const THEMES: { id: ThemeId; label: string; desc: string; colors: string[] }[] =
     label: "Sea Cyber Light",
     desc: "夏の海をテーマにしたグラスモーフィズムデザイン",
     colors: ["#00bfff", "#5ef6e6", "#00668a", "#f5fafc"],
+  },
+  {
+    id: "autumn-cyber",
+    label: "Deep Autumn Cyber",
+    desc: "秋の深みをテーマにしたSolar-Cyber×Brutalismデザイン",
+    colors: ["#a33e00", "#ff6600", "#805600", "#fcf9f4"],
   },
 ];
 

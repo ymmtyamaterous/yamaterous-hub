@@ -1,0 +1,307 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Deep Autumn Cyber テーマ
+   data-site-theme="autumn-cyber" が <html> に付いているときのみ有効
+   Solar-Cyber × Brutalism × Glassmorphism
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root[data-site-theme="autumn-cyber"] {
+  /* ── デザイントークン ── */
+  --sc-bg:      #fcf9f4;
+  --sc-bg2:     #f0ede9;
+  --sc-sakura:  #a33e00;   /* primary: burnt orange */
+  --sc-sakura2: #7c2e00;
+  --sc-sakura3: #ffdbcd;   /* primary-fixed: salmon pink */
+  --sc-cyber:   #805600;   /* tertiary: amber/gold */
+  --sc-cyber2:  #ac322e;   /* secondary: deep red */
+  --sc-cyber3:  #6d0008;   /* on-secondary-container */
+  --sc-neon-y:  #c98a00;   /* tertiary-container: amber glow */
+  --sc-text:    #1c1c19;
+  --sc-muted:   #5a4136;
+  --sc-surface: rgba(163, 62, 0, 0.05);
+  --sc-glow-pink: 0 0 10px rgba(163, 62, 0, 0.25);
+  --sc-glow-cyan: 0 0 10px rgba(128, 86, 0, 0.2);
+  --sc-font-jp:   "Space Grotesk", sans-serif;
+  --sc-font-mono: "Space Grotesk", monospace;
+
+  /* ── 背景色 ── */
+  background-color: #fcf9f4;
+  color: #1c1c19;
+}
+
+/* scanline: 琥珀色系に変更 */
+[data-site-theme="autumn-cyber"] body::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(163, 62, 0, 0.02) 3px,
+    rgba(163, 62, 0, 0.02) 4px
+  );
+}
+
+/* grid background: 琥珀グリッド */
+[data-site-theme="autumn-cyber"] .sc-grid-bg {
+  background-image:
+    linear-gradient(rgba(163, 62, 0, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163, 62, 0, 0.07) 1px, transparent 1px);
+}
+
+/* glow blobs: アンバー・オレンジ */
+[data-site-theme="autumn-cyber"] .sc-gb1 {
+  background: rgba(255, 102, 0, 0.2);
+}
+[data-site-theme="autumn-cyber"] .sc-gb2 {
+  background: rgba(201, 138, 0, 0.18);
+}
+[data-site-theme="autumn-cyber"] .sc-gb3 {
+  background: rgba(172, 50, 46, 0.12);
+}
+
+/* ── ヘッダー: アンバーグラス ── */
+[data-site-theme="autumn-cyber"] header {
+  background: rgba(252, 249, 244, 0.88) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(163, 62, 0, 0.18) !important;
+  box-shadow: 0 4px 24px rgba(163, 62, 0, 0.06);
+}
+
+/* ── グラスカード（ターミナル） ── */
+[data-site-theme="autumn-cyber"] .sc-terminal {
+  background: rgba(30, 16, 8, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 102, 0, 0.4) !important;
+  box-shadow:
+    0 8px 32px rgba(163, 62, 0, 0.18),
+    inset 0 1px 0 rgba(255, 200, 160, 0.12) !important;
+}
+
+[data-site-theme="autumn-cyber"] .sc-term-bar {
+  background: rgba(255, 140, 60, 0.1) !important;
+  border-bottom: 1px solid rgba(255, 102, 0, 0.25) !important;
+}
+
+[data-site-theme="autumn-cyber"] .sc-term-body {
+  background: rgba(30, 16, 8, 0.1);
+  color: #d4a878;
+}
+
+/* ── h1 グリッチ色変更（オレンジ×深紅） ── */
+[data-site-theme="autumn-cyber"] .sc-h1-cyber {
+  color: var(--sc-sakura);
+  text-shadow: 0 0 20px rgba(255, 102, 0, 0.35);
+}
+[data-site-theme="autumn-cyber"] .sc-h1-cyber::before {
+  color: var(--sc-cyber2);
+}
+[data-site-theme="autumn-cyber"] .sc-h1-cyber::after {
+  color: var(--sc-neon-y);
+}
+[data-site-theme="autumn-cyber"] .sc-h1-outline {
+  -webkit-text-stroke: 2px var(--sc-cyber);
+}
+
+/* ── ボタン ── */
+[data-site-theme="autumn-cyber"] .sc-btn-sakura {
+  background: linear-gradient(135deg, #ff6600 0%, #c98a00 100%);
+  box-shadow: 0 4px 16px rgba(255, 102, 0, 0.3);
+}
+[data-site-theme="autumn-cyber"] .sc-btn-sakura::before {
+  background: linear-gradient(135deg, #c98a00 0%, #ff6600 100%);
+}
+[data-site-theme="autumn-cyber"] .sc-btn-sakura:hover {
+  box-shadow: 0 6px 24px rgba(255, 102, 0, 0.4);
+}
+[data-site-theme="autumn-cyber"] .sc-btn-ghost {
+  border-color: rgba(128, 86, 0, 0.45);
+  color: var(--sc-cyber);
+  background: rgba(128, 86, 0, 0.06);
+}
+[data-site-theme="autumn-cyber"] .sc-btn-ghost:hover {
+  border-color: var(--sc-cyber);
+  background: rgba(128, 86, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(128, 86, 0, 0.18);
+}
+
+/* ── 秋ディバイダー（🍁） ── */
+[data-site-theme="autumn-cyber"] .sc-sakura-divider {
+  color: rgba(163, 62, 0, 0.5);
+  border-top-color: rgba(163, 62, 0, 0.12);
+  border-bottom-color: rgba(163, 62, 0, 0.12);
+  background: var(--sc-bg2);
+  letter-spacing: 0.8em;
+}
+[data-site-theme="autumn-cyber"] .sc-sakura-divider::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 102, 0, 0.06), transparent);
+}
+[data-site-theme="autumn-cyber"] .sc-wk-card {
+  background: rgba(252, 249, 244, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(163, 62, 0, 0.18);
+  box-shadow: 0 2px 12px rgba(163, 62, 0, 0.06);
+}
+[data-site-theme="autumn-cyber"] .sc-wk-card::after {
+  background: linear-gradient(135deg, rgba(163, 62, 0, 0.04), transparent);
+}
+[data-site-theme="autumn-cyber"] .sc-wk-card:hover {
+  border-color: rgba(255, 102, 0, 0.45);
+  box-shadow: 0 8px 32px rgba(255, 102, 0, 0.15);
+}
+[data-site-theme="autumn-cyber"] .sc-wk-thumb {
+  background: linear-gradient(135deg, var(--sc-sakura3), rgba(201, 138, 0, 0.2));
+  border-bottom-color: rgba(163, 62, 0, 0.12);
+}
+[data-site-theme="autumn-cyber"] .sc-wk-tag {
+  border-color: rgba(163, 62, 0, 0.25);
+}
+
+/* ── タグ ── */
+[data-site-theme="autumn-cyber"] .sc-tag {
+  border-color: rgba(163, 62, 0, 0.35);
+  background: rgba(163, 62, 0, 0.07);
+  color: var(--sc-sakura);
+}
+
+/* ── セクションタグ ── */
+[data-site-theme="autumn-cyber"] .sc-s-tag {
+  color: var(--sc-cyber);
+}
+[data-site-theme="autumn-cyber"] .sc-s-tag::before {
+  color: rgba(128, 86, 0, 0.5);
+}
+
+/* ── ターミナル内テキスト色（アンバー系） ── */
+[data-site-theme="autumn-cyber"] .sc-tl-prompt { color: #ff8c42; }
+[data-site-theme="autumn-cyber"] .sc-tl-cmd    { color: #f5e6c8; }
+[data-site-theme="autumn-cyber"] .sc-tl-out    { color: #a87c5a; }
+[data-site-theme="autumn-cyber"] .sc-tl-cyan   { color: #c98a00; }
+[data-site-theme="autumn-cyber"] .sc-tl-pink   { color: #ff6600; }
+[data-site-theme="autumn-cyber"] .sc-tl-green  { color: #7a9e3c; }
+
+/* ── ターミナルドット（秋カラー） ── */
+[data-site-theme="autumn-cyber"] .sc-td1 { background: #ac322e; box-shadow: 0 0 6px #ac322e; }
+[data-site-theme="autumn-cyber"] .sc-td2 { background: #c98a00; box-shadow: 0 0 6px #c98a00; }
+[data-site-theme="autumn-cyber"] .sc-td3 { background: #a33e00; box-shadow: 0 0 6px #a33e00; }
+
+/* ── ターミナルタイトル ── */
+[data-site-theme="autumn-cyber"] .sc-term-title { color: #8a6a50; }
+
+/* ── hero sub テキストの左ボーダー ── */
+[data-site-theme="autumn-cyber"] .sc-hero-sub {
+  border-left-color: rgba(163, 62, 0, 0.35);
+}
+
+/* ── vline: アンバーグラデーション ── */
+[data-site-theme="autumn-cyber"] .sc-vline {
+  background: linear-gradient(180deg, transparent 0%, #ff6600 40%, #805600 70%, transparent 100%);
+}
+
+/* ── sys dot ── */
+[data-site-theme="autumn-cyber"] .sc-sys-dot {
+  background: var(--sc-neon-y);
+  box-shadow: 0 0 6px var(--sc-neon-y);
+}
+
+/* ── scanline ターミナル ── */
+[data-site-theme="autumn-cyber"] .sc-term-scanline::after {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* ── ターミナル float アニメーション（緩やか） ── */
+[data-site-theme="autumn-cyber"] .sc-terminal {
+  animation: sc-autumn-term-float 7s ease-in-out infinite !important;
+}
+@keyframes sc-autumn-term-float {
+  0%, 100% { transform: translateY(0) rotateX(1deg); }
+  50%       { transform: translateY(-12px) rotateX(-1deg); }
+}
+
+/* ── works セクション背景 ── */
+[data-site-theme="autumn-cyber"] .sc-works-section {
+  background: #f0ede9 !important;
+  border-top-color: rgba(163, 62, 0, 0.1) !important;
+}
+
+/* ── ヘッダーロゴ色 ── */
+[data-site-theme="autumn-cyber"] .sc-logo-primary {
+  color: var(--sc-sakura) !important;
+  text-shadow: 0 0 10px rgba(255, 102, 0, 0.3) !important;
+}
+
+/* ── フッター ── */
+[data-site-theme="autumn-cyber"] footer {
+  background: rgba(240, 237, 233, 0.9) !important;
+  border-top: 1px solid rgba(163, 62, 0, 0.15) !important;
+}
+
+/* ── カスタムカーソル ── */
+[data-site-theme="autumn-cyber"] .sc-cur {
+  background: #ff6600 !important;
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.45) !important;
+}
+[data-site-theme="autumn-cyber"] .sc-cur.big {
+  background: rgba(255, 102, 0, 0.1) !important;
+  border-color: #ff6600 !important;
+}
+[data-site-theme="autumn-cyber"] .sc-cur-trail {
+  border-color: rgba(255, 102, 0, 0.35) !important;
+}
+
+/* ── ナビ アクティブリンク ── */
+[data-site-theme="autumn-cyber"] nav a.sc-nav-link[aria-current="page"] {
+  border: 1px solid rgba(163, 62, 0, 0.3) !important;
+  background: rgba(163, 62, 0, 0.05) !important;
+}
+
+/* ── ページカード（works・blog 一覧） ── */
+[data-site-theme="autumn-cyber"] .sc-page-card {
+  background: rgba(252, 249, 244, 0.85) !important;
+  border-color: rgba(163, 62, 0, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(163, 62, 0, 0.06) !important;
+}
+[data-site-theme="autumn-cyber"] .sc-page-card:hover {
+  border-color: rgba(255, 102, 0, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(255, 102, 0, 0.14) !important;
+}
+
+/* ── works 詳細 ── */
+[data-site-theme="autumn-cyber"] .sc-work-thumb {
+  border-color: rgba(163, 62, 0, 0.12) !important;
+}
+[data-site-theme="autumn-cyber"] .sc-work-desc {
+  border-top-color: rgba(163, 62, 0, 0.1) !important;
+}
+[data-site-theme="autumn-cyber"] .sc-work-btn {
+  box-shadow: 0 2px 12px rgba(255, 102, 0, 0.25) !important;
+}
+
+/* ── blog フィルター入力・ソートコントロール ── */
+[data-site-theme="autumn-cyber"] .sc-filter-input,
+[data-site-theme="autumn-cyber"] .sc-sort-select,
+[data-site-theme="autumn-cyber"] .sc-sort-btn {
+  background: rgba(252, 249, 244, 0.85) !important;
+  border-color: rgba(163, 62, 0, 0.2) !important;
+}
+
+/* ── blog カテゴリフィルターボタン ── */
+[data-site-theme="autumn-cyber"] .sc-filter-btn {
+  border-color: rgba(163, 62, 0, 0.2) !important;
+}
+[data-site-theme="autumn-cyber"] .sc-filter-btn.sc-filter-btn--active {
+  background: rgba(163, 62, 0, 0.08) !important;
+  border-color: var(--sc-sakura) !important;
+}
+
+/* ── カテゴリバッジ（blog一覧・詳細） ── */
+[data-site-theme="autumn-cyber"] .sc-category-badge {
+  background: rgba(163, 62, 0, 0.07) !important;
+  border-color: rgba(163, 62, 0, 0.18) !important;
+}
+
+/* ── blog 記事ヘッダー区切り線 ── */
+[data-site-theme="autumn-cyber"] .sc-post-header-divider {
+  border-top-color: rgba(163, 62, 0, 0.1) !important;
+}
