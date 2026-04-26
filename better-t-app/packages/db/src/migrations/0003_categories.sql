@@ -6,10 +6,13 @@ CREATE TABLE `category` (
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
 );
-
+--> statement-breakpoint
 CREATE UNIQUE INDEX `category_name_unique` ON `category` (`name`);
+--> statement-breakpoint
 CREATE UNIQUE INDEX `category_slug_unique` ON `category` (`slug`);
+--> statement-breakpoint
 CREATE INDEX `category_slug_idx` ON `category` (`slug`);
+--> statement-breakpoint
 CREATE TABLE `post_category` (
 	`post_id` text NOT NULL,
 	`category_id` text NOT NULL,
