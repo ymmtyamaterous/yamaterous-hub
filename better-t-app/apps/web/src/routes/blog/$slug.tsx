@@ -189,6 +189,7 @@ function BlogPostPage() {
                     display: "inline-block",
                     transition: "all 0.15s",
                   }}
+                  className="sc-category-badge"
                 >
                   {c.name}
                 </span>
@@ -217,8 +218,7 @@ function BlogPostPage() {
         style={{
           borderTop: "1px solid rgba(200,0,90,0.1)",
           paddingTop: "1.5rem",
-        }}
-      >
+        }}        className="sc-post-header-divider"      >
         <Link
           to="/blog"
           style={{

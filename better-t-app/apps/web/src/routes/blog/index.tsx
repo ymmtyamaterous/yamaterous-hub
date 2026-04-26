@@ -93,7 +93,7 @@ function BlogIndexPage() {
             placeholder="記事を検索..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            className="dark:!bg-neutral-800/80 dark:!text-neutral-100 dark:!border-pink-900/30"
+            className="sc-filter-input dark:!bg-neutral-800/80 dark:!text-neutral-100 dark:!border-pink-900/30"
           />
         </div>
 
@@ -120,6 +120,7 @@ function BlogIndexPage() {
               color: categoryId === "" ? "var(--sc-sakura)" : "var(--sc-muted)",
               cursor: "pointer",
             }}
+            className={`sc-filter-btn${categoryId === "" ? " sc-filter-btn--active" : ""}`}
           >
             すべて
           </button>
@@ -138,6 +139,7 @@ function BlogIndexPage() {
                 color: categoryId === c.id ? "var(--sc-sakura)" : "var(--sc-muted)",
                 cursor: "pointer",
               }}
+              className={`sc-filter-btn${categoryId === c.id ? " sc-filter-btn--active" : ""}`}
             >
               {c.name}
             </button>
@@ -159,7 +161,7 @@ function BlogIndexPage() {
               }}
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="dark:!bg-neutral-800/80 dark:!text-neutral-400 dark:!border-pink-900/30"
+              className="sc-sort-select dark:!bg-neutral-800/80 dark:!text-neutral-400 dark:!border-pink-900/30"
             >
               <option value="publishedAt">公開日</option>
               <option value="createdAt">作成日</option>
@@ -178,6 +180,7 @@ function BlogIndexPage() {
                 color: "var(--sc-muted)",
                 cursor: "pointer",
               }}
+              className="sc-sort-btn"
             >
               {order === "desc" ? "↓" : "↑"}
             </button>
@@ -226,7 +229,7 @@ function BlogIndexPage() {
                   transition: "all 0.15s",
                   cursor: "pointer",
                 }}
-                className="dark:!bg-neutral-800/80 dark:!border-pink-900/20 hover:!border-[var(--sc-sakura)] hover:!shadow-[0_2px_16px_rgba(200,0,90,0.12)]"
+                className="sc-page-card dark:!bg-neutral-800/80 dark:!border-pink-900/20 hover:!border-[var(--sc-sakura)]"
               >
                 <div
                   style={{
@@ -281,6 +284,7 @@ function BlogIndexPage() {
                           color: "var(--sc-sakura)",
                           border: "1px solid rgba(200,0,90,0.15)",
                         }}
+                        className="sc-category-badge"
                       >
                         {c.name}
                       </span>

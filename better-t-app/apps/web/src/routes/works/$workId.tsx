@@ -84,6 +84,7 @@ function WorkDetailPage() {
             marginBottom: "2rem",
             border: "1px solid rgba(200,0,90,0.12)",
           }}
+          className="sc-work-thumb"
         />
       ) : (
         <div
@@ -162,7 +163,7 @@ function WorkDetailPage() {
           borderTop: "1px solid rgba(200,0,90,0.1)",
           paddingTop: "1.5rem",
         }}
-        className="dark:!text-neutral-300"
+        className="sc-work-desc dark:!text-neutral-300"
       >
         {work.description}
       </div>
@@ -186,6 +187,7 @@ function WorkDetailPage() {
               fontWeight: 700,
               boxShadow: "0 2px 12px rgba(200,0,90,0.3)",
             }}
+            className="sc-work-btn"
           >
             サイトを見る ↗
           </a>

@@ -100,7 +100,7 @@ function WorksPage() {
                   display: "flex",
                   flexDirection: "column",
                 }}
-                className="dark:!bg-neutral-800/80 dark:!border-pink-900/20 hover:!shadow-[0_4px_20px_rgba(200,0,90,0.15)] hover:!translate-y-[-2px]"
+                className="sc-page-card dark:!bg-neutral-800/80 dark:!border-pink-900/20 hover:!translate-y-[-2px]"
               >
                 {/* サムネイル */}
                 {w.thumbnailUrl ? (

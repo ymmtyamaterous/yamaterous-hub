@@ -85,7 +85,7 @@ export default function Header() {
               transition: "all 0.2s",
               fontWeight: 600,
             }}
-            className="hover:!text-[var(--sc-sakura)] hover:!border-pink-300 hover:!bg-[var(--sc-surface)] dark:!text-neutral-400"
+            className="sc-nav-link hover:!text-[var(--sc-sakura)] hover:!border-[var(--sc-sakura)] hover:!bg-[var(--sc-surface)] dark:!text-neutral-400"
             activeProps={{
               style: {
                 color: "var(--sc-sakura)",
@@ -110,7 +110,7 @@ export default function Header() {
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 1px;
-          background: linear-gradient(90deg, transparent, #c8005a, #005fa8, transparent);
+          background: linear-gradient(90deg, transparent, var(--sc-sakura), var(--sc-cyber), transparent);
           animation: nav-line 4s linear infinite;
           background-size: 200% 100%;
         }

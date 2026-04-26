@@ -3,7 +3,7 @@
    data-theme="sea-cyber" が <html> に付いているときのみ有効
    ───────────────────────────────────────────────────────────────────────── */
 
-[data-site-theme="sea-cyber"] {
+:root[data-site-theme="sea-cyber"] {
   /* ── デザイントークン ── */
   --sc-bg:      #f5fafc;
   --sc-bg2:     #eff4f6;
@@ -279,4 +279,66 @@
 }
 [data-site-theme="sea-cyber"] .sc-cur-trail {
   border-color: rgba(0, 191, 255, 0.3) !important;
+}
+
+/* ── フッター（インラインスタイル上書き） ── */
+[data-site-theme="sea-cyber"] footer {
+  background: rgba(239, 244, 246, 0.9) !important;
+  border-top: 1px solid rgba(0, 102, 138, 0.12) !important;
+}
+
+/* ── ナビ アクティブリンク ── */
+[data-site-theme="sea-cyber"] nav a.sc-nav-link[aria-current="page"] {
+  border: 1px solid rgba(0, 102, 138, 0.3) !important;
+  background: rgba(0, 102, 138, 0.05) !important;
+}
+
+/* ── ページカード（works・blog 一覧） ── */
+[data-site-theme="sea-cyber"] .sc-page-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(0, 102, 138, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 191, 255, 0.06) !important;
+}
+[data-site-theme="sea-cyber"] .sc-page-card:hover {
+  border-color: rgba(0, 191, 255, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(0, 191, 255, 0.15) !important;
+}
+
+/* ── works 詳細 ── */
+[data-site-theme="sea-cyber"] .sc-work-thumb {
+  border-color: rgba(0, 102, 138, 0.12) !important;
+}
+[data-site-theme="sea-cyber"] .sc-work-desc {
+  border-top-color: rgba(0, 102, 138, 0.1) !important;
+}
+[data-site-theme="sea-cyber"] .sc-work-btn {
+  box-shadow: 0 2px 12px rgba(0, 191, 255, 0.25) !important;
+}
+
+/* ── blog フィルター入力・ソートコントロール ── */
+[data-site-theme="sea-cyber"] .sc-filter-input,
+[data-site-theme="sea-cyber"] .sc-sort-select,
+[data-site-theme="sea-cyber"] .sc-sort-btn {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(0, 102, 138, 0.2) !important;
+}
+
+/* ── blog カテゴリフィルターボタン ── */
+[data-site-theme="sea-cyber"] .sc-filter-btn {
+  border-color: rgba(0, 102, 138, 0.2) !important;
+}
+[data-site-theme="sea-cyber"] .sc-filter-btn.sc-filter-btn--active {
+  background: rgba(0, 102, 138, 0.08) !important;
+  border-color: var(--sc-sakura) !important;
+}
+
+/* ── カテゴリバッジ（blog一覧・詳細） ── */
+[data-site-theme="sea-cyber"] .sc-category-badge {
+  background: rgba(0, 102, 138, 0.07) !important;
+  border-color: rgba(0, 102, 138, 0.18) !important;
+}
+
+/* ── blog 記事ヘッダー区切り線 ── */
+[data-site-theme="sea-cyber"] .sc-post-header-divider {
+  border-top-color: rgba(0, 102, 138, 0.1) !important;
 }
