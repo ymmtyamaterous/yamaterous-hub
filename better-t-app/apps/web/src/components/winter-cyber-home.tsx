@@ -1,36 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
-import { AutumnCyberHome } from "@/components/autumn-cyber-home";
-import { SeaCyberHome } from "@/components/sea-cyber-home";
-import { WinterCyberHome } from "@/components/winter-cyber-home";
 import { orpc } from "@/utils/orpc";
 
-export const Route = createFileRoute("/")({
-  component: HomeComponent,
-});
-
-function HomeComponent() {
-  const profileQuery = useQuery(orpc.profile.get.queryOptions());
-  const profile = profileQuery.data;
-
-  if (profile?.theme === "sea-cyber") {
-    return <SeaCyberHome />;
-  }
-
-  if (profile?.theme === "autumn-cyber") {
-    return <AutumnCyberHome />;
-  }
-
-  if (profile?.theme === "winter-cyber") {
-    return <WinterCyberHome />;
-  }
-
-  return <SakuraCyberHome />;
-}
-
-function SakuraCyberHome() {
+export function WinterCyberHome() {
   const profileQuery = useQuery(orpc.profile.get.queryOptions());
   const worksQuery = useQuery(orpc.works.list.queryOptions());
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,7 +14,7 @@ function SakuraCyberHome() {
   const profile = profileQuery.data;
   const featuredWorks = worksQuery.data?.slice(0, 3) ?? [];
 
-  // ── Sakura petal canvas ──────────────────────────────────────────────────
+  // ── Snowflake / ice crystal canvas ──────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -56,49 +30,84 @@ function SakuraCyberHome() {
     resize();
     window.addEventListener("resize", resize);
 
-    const PETAL_COUNT = 38;
-    const petals = Array.from({ length: PETAL_COUNT }, () => ({
+    const FLAKE_COUNT = 45;
+    const flakes = Array.from({ length: FLAKE_COUNT }, () => ({
       x: Math.random() * 1400,
       y: Math.random() * -600 - 20,
-      r: 5 + Math.random() * 7,
-      speed: 0.6 + Math.random() * 1.2,
-      drift: (Math.random() - 0.5) * 0.6,
-      spin: (Math.random() - 0.5) * 0.04,
+      r: 2 + Math.random() * 5,
+      speed: 0.4 + Math.random() * 0.8,
+      drift: (Math.random() - 0.5) * 0.4,
+      spin: (Math.random() - 0.5) * 0.02,
       angle: Math.random() * Math.PI * 2,
-      alpha: 0.55 + Math.random() * 0.35,
-      hue: 330 + Math.random() * 25,
+      alpha: 0.4 + Math.random() * 0.5,
+      // arms: 6-armed snowflake or simple dot
+      arms: Math.random() > 0.4 ? 6 : 0,
     }));
 
-    function drawPetal(p: (typeof petals)[0]) {
+    function drawSnowflake(p: (typeof flakes)[0]) {
       ctx!.save();
       ctx!.translate(p.x, p.y);
       ctx!.rotate(p.angle);
       ctx!.globalAlpha = p.alpha;
-      ctx!.beginPath();
-      ctx!.moveTo(0, -p.r);
-      ctx!.bezierCurveTo(p.r * 0.8, -p.r * 0.5, p.r * 0.8, p.r * 0.5, 0, p.r);
-      ctx!.bezierCurveTo(-p.r * 0.8, p.r * 0.5, -p.r * 0.8, -p.r * 0.5, 0, -p.r);
-      const grad = ctx!.createRadialGradient(0, 0, 0, 0, 0, p.r);
-      grad.addColorStop(0, `hsla(${p.hue},100%,72%,1)`);
-      grad.addColorStop(1, `hsla(${p.hue},90%,55%,0.7)`);
-      ctx!.fillStyle = grad;
-      ctx!.shadowColor = `hsla(${p.hue},100%,75%,0.8)`;
-      ctx!.shadowBlur = 8;
-      ctx!.fill();
+
+      if (p.arms === 0) {
+        // Simple ice crystal dot
+        ctx!.beginPath();
+        ctx!.arc(0, 0, p.r, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(0, 219, 231, 0.8)`;
+        ctx!.shadowColor = "rgba(0, 242, 255, 0.6)";
+        ctx!.shadowBlur = 6;
+        ctx!.fill();
+      } else {
+        // 6-armed snowflake
+        ctx!.strokeStyle = `rgba(116, 245, 255, 0.85)`;
+        ctx!.lineWidth = 0.8;
+        ctx!.shadowColor = "rgba(0, 242, 255, 0.5)";
+        ctx!.shadowBlur = 4;
+        for (let i = 0; i < 6; i++) {
+          ctx!.save();
+          ctx!.rotate((Math.PI / 3) * i);
+          ctx!.beginPath();
+          ctx!.moveTo(0, 0);
+          ctx!.lineTo(0, -p.r);
+          ctx!.stroke();
+          // Branch arms at 1/2 and 2/3 of length
+          const b1 = p.r * 0.45;
+          const b2 = p.r * 0.72;
+          const bl = p.r * 0.28;
+          ctx!.beginPath();
+          ctx!.moveTo(0, -b1);
+          ctx!.lineTo(bl * 0.6, -b1 - bl * 0.6);
+          ctx!.moveTo(0, -b1);
+          ctx!.lineTo(-bl * 0.6, -b1 - bl * 0.6);
+          ctx!.moveTo(0, -b2);
+          ctx!.lineTo(bl * 0.4, -b2 - bl * 0.4);
+          ctx!.moveTo(0, -b2);
+          ctx!.lineTo(-bl * 0.4, -b2 - bl * 0.4);
+          ctx!.stroke();
+          ctx!.restore();
+        }
+        // Center dot
+        ctx!.beginPath();
+        ctx!.arc(0, 0, 1.2, 0, Math.PI * 2);
+        ctx!.fillStyle = "rgba(0, 242, 255, 0.9)";
+        ctx!.fill();
+      }
+
       ctx!.restore();
     }
 
     function animate() {
       ctx!.clearRect(0, 0, W, H);
-      for (const p of petals) {
+      for (const p of flakes) {
         p.y += p.speed;
-        p.x += p.drift + Math.sin(p.y * 0.015) * 0.5;
+        p.x += p.drift + Math.sin(p.y * 0.018) * 0.3;
         p.angle += p.spin;
         if (p.y > H + 20) {
           p.y = -20;
           p.x = Math.random() * W;
         }
-        drawPetal(p);
+        drawSnowflake(p);
       }
       rafId = requestAnimationFrame(animate);
     }
@@ -115,11 +124,9 @@ function SakuraCyberHome() {
     const cur = curRef.current;
     const trail = trailRef.current;
     if (!cur || !trail) return;
-
     let mx = 0, my = 0;
     const onMove = (e: MouseEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
+      mx = e.clientX; my = e.clientY;
       cur.style.left = `${mx}px`;
       cur.style.top = `${my}px`;
     };
@@ -128,7 +135,6 @@ function SakuraCyberHome() {
       trail.style.left = `${mx}px`;
       trail.style.top = `${my}px`;
     }, 60);
-
     const els = document.querySelectorAll("a, button");
     const enter = () => cur.classList.add("big");
     const leave = () => cur.classList.remove("big");
@@ -136,7 +142,6 @@ function SakuraCyberHome() {
       el.addEventListener("mouseenter", enter);
       el.addEventListener("mouseleave", leave);
     }
-
     return () => {
       document.removeEventListener("mousemove", onMove);
       clearInterval(iv);
@@ -182,26 +187,20 @@ function SakuraCyberHome() {
       <div ref={trailRef} className="sc-cur-trail" />
 
       {/* Hero Section */}
-      <section className="sc-hero">
+      <section
+        className="sc-hero"
+        style={{ background: "radial-gradient(circle at 50% 50%, rgba(0,242,255,0.06), transparent)" }}
+      >
         <canvas
           ref={canvasRef}
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 1,
-            pointerEvents: "none",
-          }}
+          style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none" }}
         />
         {/* 縦ライン */}
         {[20, 50, 80].map((left, i) => (
           <div
             key={left}
             className="sc-vline"
-            style={{
-              left: `${left}%`,
-              animationDelay: `${i * 2}s`,
-              opacity: i === 1 ? 0.06 : undefined,
-            }}
+            style={{ left: `${left}%`, animationDelay: `${i * 2}s`, opacity: i === 1 ? 0.06 : undefined }}
           />
         ))}
 
@@ -229,55 +228,40 @@ function SakuraCyberHome() {
                 {h1Line3 && <span className="sc-h1-outline">{h1Line3}</span>}
               </>
             ) : (
-              <span style={{ color: "var(--sc-muted)", fontWeight: 300 }}>
-                Loading...
-              </span>
+              <span style={{ color: "var(--sc-muted)", fontWeight: 300 }}>Loading...</span>
             )}
           </h1>
 
           {/* hero sub */}
           {heroSubText && (
             <p className="sc-hero-sub">
-              {heroGreeting && <><span className="sc-hi">{heroGreeting}</span><br /></>}
+              {heroGreeting && (
+                <>
+                  <span className="sc-hi">{heroGreeting}</span>
+                  <br />
+                </>
+              )}
               {heroSubText}
             </p>
           )}
 
           {/* CTA buttons */}
           <div className="sc-hero-cta">
-            <Link
-              to="/works"
-              className="sc-btn sc-btn-sakura"
-            >
+            <Link to="/works" className="sc-btn sc-btn-sakura">
               <span>↓ Works を見る</span>
             </Link>
             {profile?.githubUrl && (
-              <a
-                href={profile.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sc-btn sc-btn-ghost"
-              >
+              <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="sc-btn sc-btn-ghost">
                 GitHub ↗
               </a>
             )}
             {profile?.twitterUrl && (
-              <a
-                href={profile.twitterUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sc-btn sc-btn-ghost"
-              >
+              <a href={profile.twitterUrl} target="_blank" rel="noopener noreferrer" className="sc-btn sc-btn-ghost">
                 X / Twitter ↗
               </a>
             )}
             {profile?.siteUrl && (
-              <a
-                href={profile.siteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sc-btn sc-btn-ghost"
-              >
+              <a href={profile.siteUrl} target="_blank" rel="noopener noreferrer" className="sc-btn sc-btn-ghost">
                 Website ↗
               </a>
             )}
@@ -319,7 +303,7 @@ function SakuraCyberHome() {
                 <span className="sc-tl-cmd">git log --oneline</span>
               </span>
               <span className="sc-tl sc-tl-out">
-                <span className="sc-tl-green">a3f2c1b</span> feat: new project 🌸
+                <span className="sc-tl-green">a3f2c1b</span> feat: new project ❄️
               </span>
               <span className="sc-tl sc-tl-out">
                 <span className="sc-tl-green">9d8e7f6</span> fix: optimized perf
@@ -337,16 +321,17 @@ function SakuraCyberHome() {
         </div>
       </section>
 
-      {/* 桜ディバイダー */}
-      <div className="sc-sakura-divider">🌸 🌸 🌸 🌸 🌸</div>
+      {/* 冬ディバイダー */}
+      <div className="sc-sakura-divider">❄️ ✨ ❄️ ✨ ❄️</div>
 
       {/* 注目作品セクション */}
       {featuredWorks.length > 0 && (
         <section
+          className="sc-works-section"
           style={{
             padding: "clamp(3rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem)",
             background: "var(--sc-bg2)",
-            borderTop: "1px solid rgba(200,0,90,0.1)",
+            borderTop: "1px solid rgba(0,105,111,0.1)",
             position: "relative",
             zIndex: 1,
           }}
@@ -376,7 +361,7 @@ function SakuraCyberHome() {
                 }}
               >
                 Recent{" "}
-                <span style={{ color: "var(--sc-cyber)" }}>Works</span>
+                <span style={{ color: "var(--sc-sakura)" }}>Works</span>
               </h2>
               <Link
                 to="/works"
@@ -422,9 +407,7 @@ function SakuraCyberHome() {
                       {w.tags.length > 0 && (
                         <div className="sc-wk-tags">
                           {w.tags.map((t) => (
-                            <span key={t.id} className="sc-wk-tag">
-                              {t.name}
-                            </span>
+                            <span key={t.id} className="sc-wk-tag">{t.name}</span>
                           ))}
                         </div>
                       )}
