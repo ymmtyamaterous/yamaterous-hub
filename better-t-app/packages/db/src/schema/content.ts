@@ -133,3 +133,58 @@ export const workTagRelations = relations(workTag, ({ one }) => ({
   work: one(work, { fields: [workTag.workId], references: [work.id] }),
   tag: one(tag, { fields: [workTag.tagId], references: [tag.id] }),
 }));
+
+// ── Category ──────────────────────────────────────────────────────────────────
+
+export const category = sqliteTable(
+  "category",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull().unique(),
+    slug: text("slug").notNull().unique(),
+    description: text("description").notNull().default(""),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("category_slug_idx").on(table.slug),
+  ],
+);
+
+// ── PostCategory (junction) ───────────────────────────────────────────────────
+
+export const postCategory = sqliteTable(
+  "post_category",
+  {
+    postId: text("post_id")
+      .notNull()
+      .references(() => post.id, { onDelete: "cascade" }),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => category.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.postId, table.categoryId] })],
+);
+
+// ── Post / Category Relations ─────────────────────────────────────────────────
+
+export const postRelations = relations(post, ({ many }) => ({
+  postCategories: many(postCategory),
+}));
+
+export const categoryRelations = relations(category, ({ many }) => ({
+  postCategories: many(postCategory),
+}));
+
+export const postCategoryRelations = relations(postCategory, ({ one }) => ({
+  post: one(post, { fields: [postCategory.postId], references: [post.id] }),
+  category: one(category, {
+    fields: [postCategory.categoryId],
+    references: [category.id],
+  }),
+}));

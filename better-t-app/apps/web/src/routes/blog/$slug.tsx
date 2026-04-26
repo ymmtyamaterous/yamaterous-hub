@@ -132,6 +132,7 @@ function BlogPostPage() {
             display: "flex",
             alignItems: "center",
             gap: "1.5rem",
+            flexWrap: "wrap",
             borderTop: "1px solid rgba(200,0,90,0.1)",
             paddingTop: "1rem",
           }}
@@ -164,6 +165,37 @@ function BlogPostPage() {
             </p>
           )}
         </div>
+
+        {/* カテゴリバッジ */}
+        {post.categories.length > 0 && (
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "0.75rem" }}>
+            {post.categories.map((c) => (
+              <Link
+                key={c.id}
+                to="/blog"
+                search={{ categoryId: c.id } as Record<string, string>}
+                style={{ textDecoration: "none" }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--sc-font-jp)",
+                    fontSize: "12px",
+                    padding: "3px 11px",
+                    borderRadius: "20px",
+                    background: "rgba(200,0,90,0.07)",
+                    color: "var(--sc-sakura)",
+                    border: "1px solid rgba(200,0,90,0.18)",
+                    cursor: "pointer",
+                    display: "inline-block",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {c.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* 記事本文 */}

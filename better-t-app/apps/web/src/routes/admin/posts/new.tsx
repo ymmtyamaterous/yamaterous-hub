@@ -1,5 +1,5 @@
 import MDEditor from "@uiw/react-md-editor";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,6 +22,9 @@ function NewPostPage() {
   );
   const [isPublished, setIsPublished] = useState(false);
   const [slugTouched, setSlugTouched] = useState(false);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+
+  const { data: categories = [] } = useQuery(orpc.categories.list.queryOptions());
 
   const createMutation = useMutation(
     orpc.posts.create.mutationOptions({
@@ -55,7 +58,14 @@ function NewPostPage() {
       toast.error("タイトルとスラッグは必須です");
       return;
     }
-    createMutation.mutate({ title, slug, content, excerpt, isPublished });
+    createMutation.mutate({
+      title,
+      slug,
+      content,
+      excerpt,
+      isPublished,
+      categoryIds: selectedCategoryIds,
+    });
   };
 
   const inputStyle: React.CSSProperties = {
@@ -158,6 +168,61 @@ function NewPostPage() {
               className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
             />
           </div>
+          {/* カテゴリ選択 */}
+          {categories.length > 0 && (
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={labelStyle}>カテゴリ（複数選択可）</label>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
+                }}
+              >
+                {categories.map((cat) => {
+                  const checked = selectedCategoryIds.includes(cat.id);
+                  return (
+                    <label
+                      key={cat.id}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        padding: "0.3rem 0.75rem",
+                        border: checked
+                          ? "1px solid var(--sc-sakura)"
+                          : "1px solid rgba(200,0,90,0.2)",
+                        borderRadius: "20px",
+                        background: checked
+                          ? "rgba(200,0,90,0.08)"
+                          : "transparent",
+                        cursor: "pointer",
+                        fontFamily: "var(--sc-font-jp)",
+                        fontSize: "12px",
+                        color: checked ? "var(--sc-sakura)" : "var(--sc-muted)",
+                        userSelect: "none",
+                        transition: "all 0.15s",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          setSelectedCategoryIds((prev) =>
+                            e.target.checked
+                              ? [...prev, cat.id]
+                              : prev.filter((id) => id !== cat.id),
+                          );
+                        }}
+                        style={{ display: "none" }}
+                      />
+                      {cat.name}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div
             style={{
               gridColumn: "1 / -1",

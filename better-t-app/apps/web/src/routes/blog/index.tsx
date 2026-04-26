@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { orpc } from "@/utils/orpc";
 
@@ -8,9 +9,23 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogIndexPage() {
+  const [keyword, setKeyword] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [sortBy, setSortBy] = useState<"publishedAt" | "createdAt" | "title">("publishedAt");
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
+
+  const filters = {
+    keyword: keyword || undefined,
+    categoryId: categoryId || undefined,
+    sortBy,
+    order,
+  };
+
   const { data: posts = [], isLoading } = useQuery(
-    orpc.posts.list.queryOptions(),
+    orpc.posts.list.queryOptions({ input: filters }),
   );
+
+  const { data: categories = [] } = useQuery(orpc.categories.list.queryOptions());
 
   return (
     <div
@@ -21,7 +36,7 @@ function BlogIndexPage() {
       }}
     >
       {/* ヘッダー */}
-      <div style={{ marginBottom: "3rem" }}>
+      <div style={{ marginBottom: "2rem" }}>
         <div
           style={{
             fontFamily: "var(--sc-font-mono)",
@@ -58,6 +73,118 @@ function BlogIndexPage() {
         </p>
       </div>
 
+      {/* 検索・フィルター */}
+      <div style={{ marginBottom: "2rem" }}>
+        {/* キーワード検索 */}
+        <div style={{ marginBottom: "1rem" }}>
+          <input
+            style={{
+              fontFamily: "var(--sc-font-jp)",
+              fontSize: "14px",
+              padding: "0.55rem 1rem",
+              border: "1px solid rgba(200,0,90,0.2)",
+              borderRadius: "3px",
+              background: "rgba(253,246,239,0.8)",
+              color: "var(--sc-text)",
+              outline: "none",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
+            placeholder="記事を検索..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            className="dark:!bg-neutral-800/80 dark:!text-neutral-100 dark:!border-pink-900/30"
+          />
+        </div>
+
+        {/* カテゴリフィルター + ソート */}
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* カテゴリボタン */}
+          <button
+            type="button"
+            onClick={() => setCategoryId("")}
+            style={{
+              fontFamily: "var(--sc-font-jp)",
+              fontSize: "12px",
+              padding: "0.3rem 0.9rem",
+              borderRadius: "20px",
+              border: categoryId === "" ? "1px solid var(--sc-sakura)" : "1px solid rgba(200,0,90,0.2)",
+              background: categoryId === "" ? "rgba(200,0,90,0.08)" : "transparent",
+              color: categoryId === "" ? "var(--sc-sakura)" : "var(--sc-muted)",
+              cursor: "pointer",
+            }}
+          >
+            すべて
+          </button>
+          {categories.map((c) => (
+            <button
+              type="button"
+              key={c.id}
+              onClick={() => setCategoryId(c.id === categoryId ? "" : c.id)}
+              style={{
+                fontFamily: "var(--sc-font-jp)",
+                fontSize: "12px",
+                padding: "0.3rem 0.9rem",
+                borderRadius: "20px",
+                border: categoryId === c.id ? "1px solid var(--sc-sakura)" : "1px solid rgba(200,0,90,0.2)",
+                background: categoryId === c.id ? "rgba(200,0,90,0.08)" : "transparent",
+                color: categoryId === c.id ? "var(--sc-sakura)" : "var(--sc-muted)",
+                cursor: "pointer",
+              }}
+            >
+              {c.name}
+            </button>
+          ))}
+
+          {/* ソート（右端） */}
+          <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <select
+              style={{
+                fontFamily: "var(--sc-font-jp)",
+                fontSize: "12px",
+                padding: "0.3rem 0.5rem",
+                border: "1px solid rgba(200,0,90,0.2)",
+                borderRadius: "3px",
+                background: "rgba(253,246,239,0.8)",
+                color: "var(--sc-muted)",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="dark:!bg-neutral-800/80 dark:!text-neutral-400 dark:!border-pink-900/30"
+            >
+              <option value="publishedAt">公開日</option>
+              <option value="createdAt">作成日</option>
+              <option value="title">タイトル</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => setOrder((o) => (o === "desc" ? "asc" : "desc"))}
+              style={{
+                fontFamily: "var(--sc-font-mono)",
+                fontSize: "12px",
+                padding: "0.3rem 0.6rem",
+                border: "1px solid rgba(200,0,90,0.2)",
+                borderRadius: "3px",
+                background: "transparent",
+                color: "var(--sc-muted)",
+                cursor: "pointer",
+              }}
+            >
+              {order === "desc" ? "↓" : "↑"}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* 記事一覧 */}
       {isLoading ? (
         <div
@@ -79,7 +206,7 @@ function BlogIndexPage() {
             textAlign: "center",
           }}
         >
-          記事がまだありません
+          記事が見つかりません
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -138,6 +265,29 @@ function BlogIndexPage() {
                     ).toLocaleDateString("ja-JP")}
                   </time>
                 </div>
+
+                {/* カテゴリバッジ */}
+                {post.categories.length > 0 && (
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "0.6rem" }}>
+                    {post.categories.map((c) => (
+                      <span
+                        key={c.id}
+                        style={{
+                          fontFamily: "var(--sc-font-jp)",
+                          fontSize: "11px",
+                          padding: "2px 9px",
+                          borderRadius: "20px",
+                          background: "rgba(200,0,90,0.07)",
+                          color: "var(--sc-sakura)",
+                          border: "1px solid rgba(200,0,90,0.15)",
+                        }}
+                      >
+                        {c.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {post.excerpt && (
                   <p
                     style={{

@@ -22,6 +22,7 @@ import { Route as AdminSiteRouteImport } from './routes/admin/site'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminWorksIndexRouteImport } from './routes/admin/works/index'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin/posts/index'
+import { Route as AdminCategoriesIndexRouteImport } from './routes/admin/categories/index'
 import { Route as AdminWorksNewRouteImport } from './routes/admin/works/new'
 import { Route as AdminPostsNewRouteImport } from './routes/admin/posts/new'
 import { Route as AdminWorksWorkIdEditRouteImport } from './routes/admin/works/$workId/edit'
@@ -92,6 +93,11 @@ const AdminPostsIndexRoute = AdminPostsIndexRouteImport.update({
   path: '/posts/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCategoriesIndexRoute = AdminCategoriesIndexRouteImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminWorksNewRoute = AdminWorksNewRouteImport.update({
   id: '/works/new',
   path: '/works/new',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/works/': typeof WorksIndexRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
+  '/admin/categories/': typeof AdminCategoriesIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/works/': typeof AdminWorksIndexRoute
   '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/works': typeof WorksIndexRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
+  '/admin/categories': typeof AdminCategoriesIndexRoute
   '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/works': typeof AdminWorksIndexRoute
   '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/works/': typeof WorksIndexRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
+  '/admin/categories/': typeof AdminCategoriesIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/works/': typeof AdminWorksIndexRoute
   '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/works/'
     | '/admin/posts/new'
     | '/admin/works/new'
+    | '/admin/categories/'
     | '/admin/posts/'
     | '/admin/works/'
     | '/admin/posts/$postId/edit'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/works'
     | '/admin/posts/new'
     | '/admin/works/new'
+    | '/admin/categories'
     | '/admin/posts'
     | '/admin/works'
     | '/admin/posts/$postId/edit'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/works/'
     | '/admin/posts/new'
     | '/admin/works/new'
+    | '/admin/categories/'
     | '/admin/posts/'
     | '/admin/works/'
     | '/admin/posts/$postId/edit'
@@ -333,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPostsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/categories/': {
+      id: '/admin/categories/'
+      path: '/categories'
+      fullPath: '/admin/categories/'
+      preLoaderRoute: typeof AdminCategoriesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/works/new': {
       id: '/admin/works/new'
       path: '/works/new'
@@ -370,6 +389,7 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminPostsNewRoute: typeof AdminPostsNewRoute
   AdminWorksNewRoute: typeof AdminWorksNewRoute
+  AdminCategoriesIndexRoute: typeof AdminCategoriesIndexRoute
   AdminPostsIndexRoute: typeof AdminPostsIndexRoute
   AdminWorksIndexRoute: typeof AdminWorksIndexRoute
   AdminPostsPostIdEditRoute: typeof AdminPostsPostIdEditRoute
@@ -382,6 +402,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminPostsNewRoute: AdminPostsNewRoute,
   AdminWorksNewRoute: AdminWorksNewRoute,
+  AdminCategoriesIndexRoute: AdminCategoriesIndexRoute,
   AdminPostsIndexRoute: AdminPostsIndexRoute,
   AdminWorksIndexRoute: AdminWorksIndexRoute,
   AdminPostsPostIdEditRoute: AdminPostsPostIdEditRoute,
