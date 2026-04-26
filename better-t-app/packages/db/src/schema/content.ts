@@ -90,6 +90,35 @@ export const workTag = sqliteTable(
   (table) => [primaryKey({ columns: [table.workId, table.tagId] })],
 );
 
+// ── Post ─────────────────────────────────────────────────────────────────────
+
+export const post = sqliteTable(
+  "post",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull().unique(),
+    content: text("content").notNull().default(""),
+    excerpt: text("excerpt").notNull().default(""),
+    isPublished: integer("is_published", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    publishedAt: integer("published_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("post_slug_idx").on(table.slug),
+    index("post_is_published_idx").on(table.isPublished),
+    index("post_published_at_idx").on(table.publishedAt),
+  ],
+);
+
 // ── Relations ────────────────────────────────────────────────────────────────
 
 export const workRelations = relations(work, ({ many }) => ({

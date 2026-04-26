@@ -67,6 +67,7 @@ export default function Header() {
           [
             { to: "/", label: "HOME" },
             { to: "/works", label: "WORKS" },
+            { to: "/blog", label: "BLOG" },
           ] as const
         ).map(({ to, label }) => (
           <Link
