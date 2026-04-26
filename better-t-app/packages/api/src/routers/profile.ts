@@ -24,6 +24,7 @@ const ProfileOutput = z.object({
   h1Line2: z.string(),
   h1Line3: z.string(),
   heroSubText: z.string(),
+  theme: z.enum(["sakura-cyber", "sea-cyber", "autumn-cyber", "winter-cyber"]),
 });
 
 const ProfileUpdateInput = z.object({
@@ -41,6 +42,7 @@ const ProfileUpdateInput = z.object({
   h1Line2: z.string().max(60).optional(),
   h1Line3: z.string().max(60).optional(),
   heroSubText: z.string().max(300).optional(),
+  theme: z.enum(["sakura-cyber", "sea-cyber", "autumn-cyber", "winter-cyber"]).optional(),
 });
 
 function toOutput(row: typeof profile.$inferSelect) {
@@ -61,6 +63,7 @@ function toOutput(row: typeof profile.$inferSelect) {
     h1Line2: row.h1Line2,
     h1Line3: row.h1Line3,
     heroSubText: row.heroSubText,
+    theme: (["sakura-cyber", "sea-cyber", "autumn-cyber", "winter-cyber"].includes(row.theme) ? row.theme : "sakura-cyber") as "sakura-cyber" | "sea-cyber" | "autumn-cyber" | "winter-cyber",
   };
 }
 
@@ -99,6 +102,7 @@ export const profileRouter = {
           ...(input.h1Line2 !== undefined && { h1Line2: input.h1Line2 }),
           ...(input.h1Line3 !== undefined && { h1Line3: input.h1Line3 }),
           ...(input.heroSubText !== undefined && { heroSubText: input.heroSubText }),
+          ...(input.theme !== undefined && { theme: input.theme }),
           updatedAt: new Date(),
         })
         .where(eq(profile.id, current.id))

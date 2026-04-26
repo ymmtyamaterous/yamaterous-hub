@@ -14,13 +14,19 @@ import { Route as AdminLoginHubRouteImport } from './routes/admin-login-hub'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as WorksWorkIdRouteImport } from './routes/works/$workId'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AdminSiteRouteImport } from './routes/admin/site'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminWorksIndexRouteImport } from './routes/admin/works/index'
+import { Route as AdminPostsIndexRouteImport } from './routes/admin/posts/index'
+import { Route as AdminCategoriesIndexRouteImport } from './routes/admin/categories/index'
 import { Route as AdminWorksNewRouteImport } from './routes/admin/works/new'
+import { Route as AdminPostsNewRouteImport } from './routes/admin/posts/new'
 import { Route as AdminWorksWorkIdEditRouteImport } from './routes/admin/works/$workId/edit'
+import { Route as AdminPostsPostIdEditRouteImport } from './routes/admin/posts/$postId/edit'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -47,6 +53,11 @@ const WorksIndexRoute = WorksIndexRouteImport.update({
   path: '/works/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,6 +66,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const WorksWorkIdRoute = WorksWorkIdRouteImport.update({
   id: '/works/$workId',
   path: '/works/$workId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSiteRoute = AdminSiteRouteImport.update({
@@ -72,14 +88,34 @@ const AdminWorksIndexRoute = AdminWorksIndexRouteImport.update({
   path: '/works/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPostsIndexRoute = AdminPostsIndexRouteImport.update({
+  id: '/posts/',
+  path: '/posts/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesIndexRoute = AdminCategoriesIndexRouteImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminWorksNewRoute = AdminWorksNewRouteImport.update({
   id: '/works/new',
   path: '/works/new',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPostsNewRoute = AdminPostsNewRouteImport.update({
+  id: '/posts/new',
+  path: '/posts/new',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminWorksWorkIdEditRoute = AdminWorksWorkIdEditRouteImport.update({
   id: '/works/$workId/edit',
   path: '/works/$workId/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPostsPostIdEditRoute = AdminPostsPostIdEditRouteImport.update({
+  id: '/posts/$postId/edit',
+  path: '/posts/$postId/edit',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -90,11 +126,17 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/works/': typeof WorksIndexRoute
+  '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
+  '/admin/categories/': typeof AdminCategoriesIndexRoute
+  '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/works/': typeof AdminWorksIndexRoute
+  '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
   '/admin/works/$workId/edit': typeof AdminWorksWorkIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -103,11 +145,17 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/works': typeof WorksIndexRoute
+  '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
+  '/admin/categories': typeof AdminCategoriesIndexRoute
+  '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/works': typeof AdminWorksIndexRoute
+  '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
   '/admin/works/$workId/edit': typeof AdminWorksWorkIdEditRoute
 }
 export interface FileRoutesById {
@@ -118,11 +166,17 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/works/': typeof WorksIndexRoute
+  '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
+  '/admin/categories/': typeof AdminCategoriesIndexRoute
+  '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/works/': typeof AdminWorksIndexRoute
+  '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
   '/admin/works/$workId/edit': typeof AdminWorksWorkIdEditRoute
 }
 export interface FileRouteTypes {
@@ -134,11 +188,17 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/admin/profile'
     | '/admin/site'
+    | '/blog/$slug'
     | '/works/$workId'
     | '/admin/'
+    | '/blog/'
     | '/works/'
+    | '/admin/posts/new'
     | '/admin/works/new'
+    | '/admin/categories/'
+    | '/admin/posts/'
     | '/admin/works/'
+    | '/admin/posts/$postId/edit'
     | '/admin/works/$workId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -147,11 +207,17 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/admin/profile'
     | '/admin/site'
+    | '/blog/$slug'
     | '/works/$workId'
     | '/admin'
+    | '/blog'
     | '/works'
+    | '/admin/posts/new'
     | '/admin/works/new'
+    | '/admin/categories'
+    | '/admin/posts'
     | '/admin/works'
+    | '/admin/posts/$postId/edit'
     | '/admin/works/$workId/edit'
   id:
     | '__root__'
@@ -161,11 +227,17 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/admin/profile'
     | '/admin/site'
+    | '/blog/$slug'
     | '/works/$workId'
     | '/admin/'
+    | '/blog/'
     | '/works/'
+    | '/admin/posts/new'
     | '/admin/works/new'
+    | '/admin/categories/'
+    | '/admin/posts/'
     | '/admin/works/'
+    | '/admin/posts/$postId/edit'
     | '/admin/works/$workId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -174,7 +246,9 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AdminLoginHubRoute: typeof AdminLoginHubRoute
   DashboardRoute: typeof DashboardRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   WorksWorkIdRoute: typeof WorksWorkIdRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   WorksIndexRoute: typeof WorksIndexRoute
 }
 
@@ -215,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -227,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/works/$workId'
       fullPath: '/works/$workId'
       preLoaderRoute: typeof WorksWorkIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/site': {
@@ -250,11 +338,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWorksIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/posts/': {
+      id: '/admin/posts/'
+      path: '/posts'
+      fullPath: '/admin/posts/'
+      preLoaderRoute: typeof AdminPostsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories/': {
+      id: '/admin/categories/'
+      path: '/categories'
+      fullPath: '/admin/categories/'
+      preLoaderRoute: typeof AdminCategoriesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/works/new': {
       id: '/admin/works/new'
       path: '/works/new'
       fullPath: '/admin/works/new'
       preLoaderRoute: typeof AdminWorksNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/posts/new': {
+      id: '/admin/posts/new'
+      path: '/posts/new'
+      fullPath: '/admin/posts/new'
+      preLoaderRoute: typeof AdminPostsNewRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/works/$workId/edit': {
@@ -264,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWorksWorkIdEditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/posts/$postId/edit': {
+      id: '/admin/posts/$postId/edit'
+      path: '/posts/$postId/edit'
+      fullPath: '/admin/posts/$postId/edit'
+      preLoaderRoute: typeof AdminPostsPostIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -271,8 +387,12 @@ interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
   AdminSiteRoute: typeof AdminSiteRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminPostsNewRoute: typeof AdminPostsNewRoute
   AdminWorksNewRoute: typeof AdminWorksNewRoute
+  AdminCategoriesIndexRoute: typeof AdminCategoriesIndexRoute
+  AdminPostsIndexRoute: typeof AdminPostsIndexRoute
   AdminWorksIndexRoute: typeof AdminWorksIndexRoute
+  AdminPostsPostIdEditRoute: typeof AdminPostsPostIdEditRoute
   AdminWorksWorkIdEditRoute: typeof AdminWorksWorkIdEditRoute
 }
 
@@ -280,8 +400,12 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
   AdminSiteRoute: AdminSiteRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminPostsNewRoute: AdminPostsNewRoute,
   AdminWorksNewRoute: AdminWorksNewRoute,
+  AdminCategoriesIndexRoute: AdminCategoriesIndexRoute,
+  AdminPostsIndexRoute: AdminPostsIndexRoute,
   AdminWorksIndexRoute: AdminWorksIndexRoute,
+  AdminPostsPostIdEditRoute: AdminPostsPostIdEditRoute,
   AdminWorksWorkIdEditRoute: AdminWorksWorkIdEditRoute,
 }
 
@@ -292,7 +416,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AdminLoginHubRoute: AdminLoginHubRoute,
   DashboardRoute: DashboardRoute,
+  BlogSlugRoute: BlogSlugRoute,
   WorksWorkIdRoute: WorksWorkIdRoute,
+  BlogIndexRoute: BlogIndexRoute,
   WorksIndexRoute: WorksIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -71,6 +71,35 @@ function Field({
   );
 }
 
+type ThemeId = "sakura-cyber" | "sea-cyber" | "autumn-cyber" | "winter-cyber";
+
+const THEMES: { id: ThemeId; label: string; desc: string; colors: string[] }[] = [
+  {
+    id: "sakura-cyber",
+    label: "Sakura Cyber",
+    desc: "サクラピンク×サイバーブルーの日本風デジタルデザイン",
+    colors: ["#c8005a", "#005fa8", "#b00040", "#fdf6ef"],
+  },
+  {
+    id: "sea-cyber",
+    label: "Sea Cyber Light",
+    desc: "夏の海をテーマにしたグラスモーフィズムデザイン",
+    colors: ["#00bfff", "#5ef6e6", "#00668a", "#f5fafc"],
+  },
+  {
+    id: "autumn-cyber",
+    label: "Deep Autumn Cyber",
+    desc: "秋の深みをテーマにしたSolar-Cyber×Brutalismデザイン",
+    colors: ["#a33e00", "#ff6600", "#805600", "#fcf9f4"],
+  },
+  {
+    id: "winter-cyber",
+    label: "Winter Cyber Light",
+    desc: "北極の氷雪をテーマにしたGlassmorphism×Minimalisimデザイン",
+    colors: ["#00696f", "#00f2ff", "#0056c4", "#f6fafe"],
+  },
+];
+
 type FormState = {
   logoSubtitle: string;
   heroTagline: string;
@@ -79,6 +108,7 @@ type FormState = {
   h1Line2: string;
   h1Line3: string;
   heroSubText: string;
+  theme: ThemeId;
 };
 
 function HeaderPreview({ logoSubtitle }: { logoSubtitle: string }) {
@@ -350,6 +380,7 @@ function AdminSitePage() {
     h1Line2: "",
     h1Line3: "",
     heroSubText: "",
+    theme: "sakura-cyber",
   });
   const [initialized, setInitialized] = useState(false);
 
@@ -362,6 +393,7 @@ function AdminSitePage() {
       h1Line2: profile.h1Line2,
       h1Line3: profile.h1Line3,
       heroSubText: profile.heroSubText,
+      theme: profile.theme,
     });
     setInitialized(true);
   }
@@ -414,7 +446,102 @@ function AdminSitePage() {
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "2.5rem", maxWidth: "960px" }}
       >
-        {/* ── ヘッダー設定 ── */}
+        {/* ── テーマ切り替え ── */}
+        <section>
+          <div
+            style={{
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "10px",
+              letterSpacing: "0.2em",
+              color: "var(--sc-sakura)",
+              marginBottom: "1rem",
+              paddingBottom: "0.5rem",
+              borderBottom: "1px solid rgba(200,0,90,0.12)",
+            }}
+          >
+            // DESIGN THEME
+          </div>
+          <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap" }}>
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setForm((v) => ({ ...v, theme: t.id }))}
+                style={{
+                  cursor: "pointer",
+                  border: form.theme === t.id
+                    ? "2px solid var(--sc-sakura)"
+                    : "2px solid rgba(200,0,90,0.15)",
+                  borderRadius: "6px",
+                  padding: "1.25rem 1.5rem",
+                  background: form.theme === t.id
+                    ? "var(--sc-surface)"
+                    : "rgba(253,246,239,0.4)",
+                  textAlign: "left",
+                  transition: "all 0.15s",
+                  minWidth: "200px",
+                  position: "relative",
+                  boxShadow: form.theme === t.id ? "0 2px 12px rgba(200,0,90,0.12)" : "none",
+                }}
+                className="dark:!bg-neutral-900/40"
+              >
+                {form.theme === t.id && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "0.5rem",
+                      right: "0.65rem",
+                      fontFamily: "var(--sc-font-mono)",
+                      fontSize: "9px",
+                      color: "var(--sc-sakura)",
+                      letterSpacing: "0.1em",
+                    }}
+                  >
+                    ACTIVE
+                  </span>
+                )}
+                {/* カラーチップ */}
+                <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.75rem" }}>
+                  {t.colors.map((c) => (
+                    <span
+                      key={c}
+                      style={{
+                        width: "18px",
+                        height: "18px",
+                        borderRadius: "50%",
+                        background: c,
+                        border: "1px solid rgba(0,0,0,0.06)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ))}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--sc-font-mono)",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    color: "var(--sc-text)",
+                    marginBottom: "0.3rem",
+                  }}
+                  className="dark:!text-neutral-100"
+                >
+                  {t.label}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--sc-font-jp)",
+                    fontSize: "12px",
+                    color: "var(--sc-muted)",
+                  }}
+                >
+                  {t.desc}
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
         <section>
           <div
             style={{
@@ -548,6 +675,39 @@ function AdminSitePage() {
               </Field>
             </div>
             <HeroPreview form={form} displayName={displayName} />
+          </div>
+        </section>
+
+        {/* ── ヘッダー設定 ── */}
+        <section>
+          <div
+            style={{
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "10px",
+              letterSpacing: "0.2em",
+              color: "var(--sc-sakura)",
+              marginBottom: "1rem",
+              paddingBottom: "0.5rem",
+              borderBottom: "1px solid rgba(200,0,90,0.12)",
+            }}
+          >
+            // HEADER
+          </div>
+          <div style={{ display: "flex", gap: "2rem", alignItems: "flex-start", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", flex: "1 1 300px", minWidth: "260px" }}>
+              <Field
+                label="ロゴ サブタイトル"
+                hint="ロゴ下に小さく表示されるテキスト（例：やまてろす・ハブ）"
+              >
+                <Input
+                  value={form.logoSubtitle}
+                  onChange={set("logoSubtitle")}
+                  style={inputStyle}
+                  placeholder="やまてろす・ハブ"
+                />
+              </Field>
+            </div>
+            <HeaderPreview logoSubtitle={form.logoSubtitle} />
           </div>
         </section>
 

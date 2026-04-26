@@ -1,125 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
-import { AutumnCyberHome } from "@/components/autumn-cyber-home";
-import { SeaCyberHome } from "@/components/sea-cyber-home";
-import { WinterCyberHome } from "@/components/winter-cyber-home";
 import { orpc } from "@/utils/orpc";
 
-export const Route = createFileRoute("/")({
-  component: HomeComponent,
-});
-
-function HomeComponent() {
-  const profileQuery = useQuery(orpc.profile.get.queryOptions());
-  const profile = profileQuery.data;
-
-  if (profile?.theme === "sea-cyber") {
-    return <SeaCyberHome />;
-  }
-
-  if (profile?.theme === "autumn-cyber") {
-    return <AutumnCyberHome />;
-  }
-
-  if (profile?.theme === "winter-cyber") {
-    return <WinterCyberHome />;
-  }
-
-  return <SakuraCyberHome />;
-}
-
-function SakuraCyberHome() {
+export function SeaCyberHome() {
   const profileQuery = useQuery(orpc.profile.get.queryOptions());
   const worksQuery = useQuery(orpc.works.list.queryOptions());
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const curRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
 
   const profile = profileQuery.data;
   const featuredWorks = worksQuery.data?.slice(0, 3) ?? [];
 
-  // ── Sakura petal canvas ──────────────────────────────────────────────────
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    let W = 0, H = 0;
-    let rafId: number;
-
-    function resize() {
-      W = canvas!.width = window.innerWidth;
-      H = canvas!.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener("resize", resize);
-
-    const PETAL_COUNT = 38;
-    const petals = Array.from({ length: PETAL_COUNT }, () => ({
-      x: Math.random() * 1400,
-      y: Math.random() * -600 - 20,
-      r: 5 + Math.random() * 7,
-      speed: 0.6 + Math.random() * 1.2,
-      drift: (Math.random() - 0.5) * 0.6,
-      spin: (Math.random() - 0.5) * 0.04,
-      angle: Math.random() * Math.PI * 2,
-      alpha: 0.55 + Math.random() * 0.35,
-      hue: 330 + Math.random() * 25,
-    }));
-
-    function drawPetal(p: (typeof petals)[0]) {
-      ctx!.save();
-      ctx!.translate(p.x, p.y);
-      ctx!.rotate(p.angle);
-      ctx!.globalAlpha = p.alpha;
-      ctx!.beginPath();
-      ctx!.moveTo(0, -p.r);
-      ctx!.bezierCurveTo(p.r * 0.8, -p.r * 0.5, p.r * 0.8, p.r * 0.5, 0, p.r);
-      ctx!.bezierCurveTo(-p.r * 0.8, p.r * 0.5, -p.r * 0.8, -p.r * 0.5, 0, -p.r);
-      const grad = ctx!.createRadialGradient(0, 0, 0, 0, 0, p.r);
-      grad.addColorStop(0, `hsla(${p.hue},100%,72%,1)`);
-      grad.addColorStop(1, `hsla(${p.hue},90%,55%,0.7)`);
-      ctx!.fillStyle = grad;
-      ctx!.shadowColor = `hsla(${p.hue},100%,75%,0.8)`;
-      ctx!.shadowBlur = 8;
-      ctx!.fill();
-      ctx!.restore();
-    }
-
-    function animate() {
-      ctx!.clearRect(0, 0, W, H);
-      for (const p of petals) {
-        p.y += p.speed;
-        p.x += p.drift + Math.sin(p.y * 0.015) * 0.5;
-        p.angle += p.spin;
-        if (p.y > H + 20) {
-          p.y = -20;
-          p.x = Math.random() * W;
-        }
-        drawPetal(p);
-      }
-      rafId = requestAnimationFrame(animate);
-    }
-    animate();
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
-
-  // ── Custom cursor ────────────────────────────────────────────────────────
+  // ── Custom cursor ──────────────────────────────────────────────────────
   useEffect(() => {
     const cur = curRef.current;
     const trail = trailRef.current;
     if (!cur || !trail) return;
-
     let mx = 0, my = 0;
     const onMove = (e: MouseEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
+      mx = e.clientX; my = e.clientY;
       cur.style.left = `${mx}px`;
       cur.style.top = `${my}px`;
     };
@@ -128,7 +29,6 @@ function SakuraCyberHome() {
       trail.style.left = `${mx}px`;
       trail.style.top = `${my}px`;
     }, 60);
-
     const els = document.querySelectorAll("a, button");
     const enter = () => cur.classList.add("big");
     const leave = () => cur.classList.remove("big");
@@ -136,7 +36,6 @@ function SakuraCyberHome() {
       el.addEventListener("mouseenter", enter);
       el.addEventListener("mouseleave", leave);
     }
-
     return () => {
       document.removeEventListener("mousemove", onMove);
       clearInterval(iv);
@@ -147,7 +46,7 @@ function SakuraCyberHome() {
     };
   }, []);
 
-  // ── Scroll reveal ────────────────────────────────────────────────────────
+  // ── Scroll reveal ──────────────────────────────────────────────────────
   useEffect(() => {
     const els = document.querySelectorAll(".sc-reveal");
     const io = new IntersectionObserver(
@@ -182,26 +81,13 @@ function SakuraCyberHome() {
       <div ref={trailRef} className="sc-cur-trail" />
 
       {/* Hero Section */}
-      <section className="sc-hero">
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 1,
-            pointerEvents: "none",
-          }}
-        />
+      <section className="sc-hero" style={{ background: "radial-gradient(circle at 50% 50%, rgba(0,191,255,0.08), transparent)" }}>
         {/* 縦ライン */}
         {[20, 50, 80].map((left, i) => (
           <div
             key={left}
             className="sc-vline"
-            style={{
-              left: `${left}%`,
-              animationDelay: `${i * 2}s`,
-              opacity: i === 1 ? 0.06 : undefined,
-            }}
+            style={{ left: `${left}%`, animationDelay: `${i * 2}s`, opacity: i === 1 ? 0.06 : undefined }}
           />
         ))}
 
@@ -229,69 +115,54 @@ function SakuraCyberHome() {
                 {h1Line3 && <span className="sc-h1-outline">{h1Line3}</span>}
               </>
             ) : (
-              <span style={{ color: "var(--sc-muted)", fontWeight: 300 }}>
-                Loading...
-              </span>
+              <span style={{ color: "var(--sc-muted)", fontWeight: 300 }}>Loading...</span>
             )}
           </h1>
 
           {/* hero sub */}
           {heroSubText && (
             <p className="sc-hero-sub">
-              {heroGreeting && <><span className="sc-hi">{heroGreeting}</span><br /></>}
+              {heroGreeting && (
+                <>
+                  <span className="sc-hi">{heroGreeting}</span>
+                  <br />
+                </>
+              )}
               {heroSubText}
             </p>
           )}
 
           {/* CTA buttons */}
           <div className="sc-hero-cta">
-            <Link
-              to="/works"
-              className="sc-btn sc-btn-sakura"
-            >
+            <Link to="/works" className="sc-btn sc-btn-sakura">
               <span>↓ Works を見る</span>
             </Link>
             {profile?.githubUrl && (
-              <a
-                href={profile.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sc-btn sc-btn-ghost"
-              >
+              <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="sc-btn sc-btn-ghost">
                 GitHub ↗
               </a>
             )}
             {profile?.twitterUrl && (
-              <a
-                href={profile.twitterUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sc-btn sc-btn-ghost"
-              >
+              <a href={profile.twitterUrl} target="_blank" rel="noopener noreferrer" className="sc-btn sc-btn-ghost">
                 X / Twitter ↗
               </a>
             )}
             {profile?.siteUrl && (
-              <a
-                href={profile.siteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sc-btn sc-btn-ghost"
-              >
+              <a href={profile.siteUrl} target="_blank" rel="noopener noreferrer" className="sc-btn sc-btn-ghost">
                 Website ↗
               </a>
             )}
           </div>
         </div>
 
-        {/* Terminal card */}
+        {/* Glassmorphism Terminal */}
         <div className="sc-hero-terminal">
           <div className="sc-terminal">
             <div className="sc-term-bar">
               <span className="sc-term-dot sc-td1" />
               <span className="sc-term-dot sc-td2" />
               <span className="sc-term-dot sc-td3" />
-              <span className="sc-term-title">~/portfolio</span>
+              <span className="sc-term-title">~/terminal/portfolio</span>
             </div>
             <div className="sc-term-body">
               <span className="sc-tl">
@@ -302,16 +173,17 @@ function SakuraCyberHome() {
               <span className="sc-tl">&nbsp;</span>
               <span className="sc-tl">
                 <span className="sc-tl-prompt">❯ </span>
-                <span className="sc-tl-cmd">cat profile.json</span>
+                <span className="sc-tl-cmd">cat skills.json</span>
               </span>
               <span className="sc-tl sc-tl-out">
-                role: <span className="sc-tl-cyan">Full-Stack Dev</span>
+                {"{"}&nbsp;
+                <span className="sc-tl-cyan">"frontend"</span>: <span className="sc-tl-pink">"React, TypeScript"</span>
               </span>
               <span className="sc-tl sc-tl-out">
-                stack: <span className="sc-tl-cyan">TypeScript</span>
+                &nbsp;&nbsp;<span className="sc-tl-cyan">"backend"</span>: <span className="sc-tl-pink">"Bun, Hono"</span>
               </span>
               <span className="sc-tl sc-tl-out">
-                runtime: <span className="sc-tl-cyan">Bun / React</span>
+                &nbsp;&nbsp;<span className="sc-tl-cyan">"cloud"</span>: <span className="sc-tl-pink">"Docker, CI/CD"</span> {"}"}
               </span>
               <span className="sc-tl">&nbsp;</span>
               <span className="sc-tl">
@@ -319,13 +191,13 @@ function SakuraCyberHome() {
                 <span className="sc-tl-cmd">git log --oneline</span>
               </span>
               <span className="sc-tl sc-tl-out">
-                <span className="sc-tl-green">a3f2c1b</span> feat: new project 🌸
+                <span className="sc-tl-green">a3f2c1b</span> feat: new project 🌊
               </span>
               <span className="sc-tl sc-tl-out">
                 <span className="sc-tl-green">9d8e7f6</span> fix: optimized perf
               </span>
               <span className="sc-tl sc-tl-out">
-                <span className="sc-tl-green">2b1a0e9</span> init: hello world
+                <span className="sc-tl-green">2b1a0e9</span> init: hello summer world
               </span>
               <span className="sc-tl">&nbsp;</span>
               <span className="sc-tl">
@@ -335,34 +207,48 @@ function SakuraCyberHome() {
             </div>
           </div>
         </div>
+
+        {/* Wave SVG */}
+        <svg
+          className="sc-waves"
+          preserveAspectRatio="none"
+          viewBox="0 24 150 28"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <title>wave</title>
+          <defs>
+            <path
+              id="gentle-wave"
+              d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+            />
+          </defs>
+          <g className="parallax">
+            <use href="#gentle-wave" x="48" y="0" fill="rgba(0,191,255,0.15)" />
+            <use href="#gentle-wave" x="48" y="3" fill="rgba(94,246,230,0.12)" />
+            <use href="#gentle-wave" x="48" y="5" fill="rgba(0,191,255,0.08)" />
+            <use href="#gentle-wave" x="48" y="7" fill="#f5fafc" />
+          </g>
+        </svg>
       </section>
 
-      {/* 桜ディバイダー */}
-      <div className="sc-sakura-divider">🌸 🌸 🌸 🌸 🌸</div>
+      {/* 波ディバイダー */}
+      <div className="sc-sakura-divider">🌊 🌊 🌊 🌊 🌊</div>
 
-      {/* 注目作品セクション */}
+      {/* 作品セクション */}
       {featuredWorks.length > 0 && (
         <section
+          className="sc-works-section"
           style={{
             padding: "clamp(3rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem)",
             background: "var(--sc-bg2)",
-            borderTop: "1px solid rgba(200,0,90,0.1)",
+            borderTop: "1px solid rgba(0,102,138,0.1)",
             position: "relative",
             zIndex: 1,
           }}
         >
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <div className="sc-s-tag sc-reveal">Selected Projects</div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "baseline",
-                flexWrap: "wrap",
-                gap: "0.75rem",
-                marginBottom: "3rem",
-              }}
-            >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: "0.75rem", marginBottom: "3rem" }}>
               <h2
                 className="sc-reveal"
                 style={{
@@ -376,7 +262,7 @@ function SakuraCyberHome() {
                 }}
               >
                 Recent{" "}
-                <span style={{ color: "var(--sc-cyber)" }}>Works</span>
+                <span style={{ color: "var(--sc-sakura)" }}>Works</span>
               </h2>
               <Link
                 to="/works"
@@ -422,9 +308,7 @@ function SakuraCyberHome() {
                       {w.tags.length > 0 && (
                         <div className="sc-wk-tags">
                           {w.tags.map((t) => (
-                            <span key={t.id} className="sc-wk-tag">
-                              {t.name}
-                            </span>
+                            <span key={t.id} className="sc-wk-tag">{t.name}</span>
                           ))}
                         </div>
                       )}

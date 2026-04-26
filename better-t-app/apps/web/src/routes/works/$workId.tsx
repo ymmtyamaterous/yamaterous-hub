@@ -19,7 +19,7 @@ function WorkDetailPage() {
         style={{
           maxWidth: "800px",
           margin: "0 auto",
-          padding: "3rem 2rem",
+          padding: "3rem clamp(1rem, 4vw, 2rem)",
           fontFamily: "var(--sc-font-mono)",
           color: "var(--sc-muted)",
           fontSize: "13px",
@@ -36,7 +36,7 @@ function WorkDetailPage() {
         style={{
           maxWidth: "800px",
           margin: "0 auto",
-          padding: "3rem 2rem",
+          padding: "3rem clamp(1rem, 4vw, 2rem)",
           fontFamily: "var(--sc-font-mono)",
           color: "var(--sc-cyber3)",
           fontSize: "13px",
@@ -51,7 +51,7 @@ function WorkDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "3rem 2rem" }}>
+    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "3rem clamp(1rem, 4vw, 2rem)" }}>
       {/* 戻るリンク */}
       <Link
         to="/works"
@@ -84,6 +84,7 @@ function WorkDetailPage() {
             marginBottom: "2rem",
             border: "1px solid rgba(200,0,90,0.12)",
           }}
+          className="sc-work-thumb"
         />
       ) : (
         <div
@@ -162,7 +163,7 @@ function WorkDetailPage() {
           borderTop: "1px solid rgba(200,0,90,0.1)",
           paddingTop: "1.5rem",
         }}
-        className="dark:!text-neutral-300"
+        className="sc-work-desc dark:!text-neutral-300"
       >
         {work.description}
       </div>
@@ -186,6 +187,7 @@ function WorkDetailPage() {
               fontWeight: 700,
               boxShadow: "0 2px 12px rgba(200,0,90,0.3)",
             }}
+            className="sc-work-btn"
           >
             サイトを見る ↗
           </a>
