@@ -19,6 +19,7 @@ const navItems = [
   { to: "/admin" as const, label: "ダッシュボード", exact: true },
   { to: "/admin/works" as const, label: "作品管理", exact: false },
   { to: "/admin/posts" as const, label: "記事管理", exact: false },
+  { to: "/admin/podcasts" as const, label: "Podcast管理", exact: false },
   { to: "/admin/categories" as const, label: "カテゴリ管理", exact: false },
   { to: "/admin/site" as const, label: "サイト設定", exact: false },
   { to: "/admin/profile" as const, label: "プロフィール", exact: false },

@@ -176,12 +176,15 @@ function RankingTable({
 
 function AdminDashboard() {
   const { data: works = [] } = useQuery(orpc.works.adminList.queryOptions());
+  const { data: podcasts = [] } = useQuery(orpc.podcasts.adminList.queryOptions());
   const { data: analytics, isLoading: analyticsLoading } = useQuery(
     orpc.analytics.getStats.queryOptions(),
   );
 
   const totalWorks = works.length;
   const publishedWorks = works.filter((w) => w.isPublished).length;
+  const totalPodcasts = podcasts.length;
+  const publishedPodcasts = podcasts.filter((p) => p.isPublished).length;
 
   return (
     <div>
@@ -236,6 +239,8 @@ function AdminDashboard() {
           value={totalWorks - publishedWorks}
           color="var(--sc-muted)"
         />
+        <StatCard label="Podcast 数" value={totalPodcasts} color="var(--sc-cyber)" />
+        <StatCard label="Podcast 公開中" value={publishedPodcasts} color="var(--sc-sakura)" />
       </div>
 
       {/* ── アクセス統計 ── */}

@@ -28,6 +28,7 @@ const { profileRouter } = await import("@better-t-app/api/routers/profile");
 const { worksRouter } = await import("@better-t-app/api/routers/works");
 const { tagsRouter } = await import("@better-t-app/api/routers/tags");
 const { analyticsRouter } = await import("@better-t-app/api/routers/analytics");
+const { podcastsRouter } = await import("@better-t-app/api/routers/podcasts");
 
 const authCtx = { context: { session: { user: { id: "user-1", name: "Test" } } } };
 const publicCtx = { context: {} };
@@ -39,6 +40,11 @@ beforeEach(async () => {
   await testDb.delete(schema.profile);
   await testDb.delete(schema.clickEvent);
   await testDb.delete(schema.pageView);
+  await testDb.delete(schema.podcastCategory);
+  await testDb.delete(schema.podcast);
+  await testDb.delete(schema.postCategory);
+  await testDb.delete(schema.post);
+  await testDb.delete(schema.category);
 });
 
 describe("profileRouter", () => {
@@ -165,6 +171,101 @@ describe("analyticsRouter", () => {
     expect(stats.totalPageViews).toBe(3);
     expect(stats.topPaths[0].path).toBe("/works");
     expect(stats.topPaths[0].count).toBe(3);
+  });
+});
+
+describe("podcastsRouter", () => {
+  test("list: 公開済みエピソードのみ返す", async () => {
+    await testDb.insert(schema.podcast).values([
+      { id: "ep1", title: "公開エピソード", slug: "published-ep", audioUrl: "/uploads/audio/a.m4a", isPublished: true, sortOrder: 0 },
+      { id: "ep2", title: "非公開エピソード", slug: "draft-ep", audioUrl: "/uploads/audio/b.m4a", isPublished: false, sortOrder: 1 },
+    ]);
+    const result = await call(podcastsRouter.list, undefined, publicCtx);
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("公開エピソード");
+  });
+
+  test("adminList: すべてのエピソードを返す", async () => {
+    await testDb.insert(schema.podcast).values([
+      { id: "ep1", title: "公開エピソード", slug: "published-ep", audioUrl: "/uploads/audio/a.m4a", isPublished: true, sortOrder: 0 },
+      { id: "ep2", title: "非公開エピソード", slug: "draft-ep", audioUrl: "/uploads/audio/b.m4a", isPublished: false, sortOrder: 1 },
+    ]);
+    const result = await call(podcastsRouter.adminList, undefined, authCtx);
+    expect(result).toHaveLength(2);
+  });
+
+  test("create: エピソードを作成できる", async () => {
+    const result = await call(
+      podcastsRouter.create,
+      { title: "テストエピソード", slug: "test-ep", audioUrl: "/uploads/audio/test.m4a", isPublished: false },
+      authCtx,
+    );
+    expect(result.title).toBe("テストエピソード");
+    expect(result.slug).toBe("test-ep");
+    expect(result.categories).toHaveLength(0);
+  });
+
+  test("create: スラッグ重複時に CONFLICT を投げる", async () => {
+    await testDb.insert(schema.podcast).values({
+      id: "ep-exist",
+      title: "既存",
+      slug: "dup-slug",
+      audioUrl: "/uploads/audio/a.m4a",
+      isPublished: false,
+      sortOrder: 0,
+    });
+    await expect(
+      call(podcastsRouter.create, { title: "新規", slug: "dup-slug", audioUrl: "/uploads/audio/b.m4a" }, authCtx),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+  });
+
+  test("create: カテゴリ付きでエピソードを作成できる", async () => {
+    await testDb.insert(schema.category).values({ id: "cat-1", name: "テック", slug: "tech" });
+    const result = await call(
+      podcastsRouter.create,
+      { title: "カテゴリ付き", slug: "with-cat", audioUrl: "/uploads/audio/c.m4a", categoryIds: ["cat-1"] },
+      authCtx,
+    );
+    expect(result.categories).toHaveLength(1);
+    expect(result.categories[0].slug).toBe("tech");
+  });
+
+  test("create: 未認証時に UNAUTHORIZED を投げる", async () => {
+    await expect(
+      call(podcastsRouter.create, { title: "無認証", slug: "no-auth", audioUrl: "/uploads/audio/x.m4a" }, publicCtx),
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+
+  test("update: エピソードを更新できる", async () => {
+    await testDb.insert(schema.podcast).values({ id: "ep-upd", title: "元タイトル", slug: "orig-slug", audioUrl: "/uploads/audio/a.m4a", isPublished: false, sortOrder: 0 });
+    const result = await call(podcastsRouter.update, { id: "ep-upd", title: "新タイトル", isPublished: true }, authCtx);
+    expect(result.title).toBe("新タイトル");
+    expect(result.isPublished).toBe(true);
+  });
+
+  test("delete: エピソードを削除できる", async () => {
+    await testDb.insert(schema.podcast).values({ id: "ep-del", title: "削除対象", slug: "del-ep", audioUrl: "/uploads/audio/a.m4a", isPublished: false, sortOrder: 0 });
+    const result = await call(podcastsRouter.delete, { id: "ep-del" }, authCtx);
+    expect(result.success).toBe(true);
+  });
+
+  test("delete: 存在しない ID で NOT_FOUND を投げる", async () => {
+    await expect(
+      call(podcastsRouter.delete, { id: "not-exist" }, authCtx),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  test("getBySlug: 公開済みエピソードをスラッグで取得できる", async () => {
+    await testDb.insert(schema.podcast).values({ id: "ep-slug", title: "スラッグ検索", slug: "find-me", audioUrl: "/uploads/audio/a.m4a", isPublished: true, sortOrder: 0 });
+    const result = await call(podcastsRouter.getBySlug, { slug: "find-me" }, publicCtx);
+    expect(result.title).toBe("スラッグ検索");
+  });
+
+  test("getBySlug: 非公開エピソードは NOT_FOUND を投げる", async () => {
+    await testDb.insert(schema.podcast).values({ id: "ep-priv", title: "非公開", slug: "hidden", audioUrl: "/uploads/audio/a.m4a", isPublished: false, sortOrder: 0 });
+    await expect(
+      call(podcastsRouter.getBySlug, { slug: "hidden" }, publicCtx),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 });
 
