@@ -22,17 +22,20 @@
 
 | 項目 | 採用技術 |
 |------|----------|
-| 言語 | Kotlin |
-| 最小 SDK | API 26 (Android 8.0) |
-| ターゲット SDK | API 35 (Android 15) |
-| アーキテクチャ | MVVM + Repository パターン |
-| UI | Jetpack Compose + Material 3 |
-| DI | Hilt |
-| 非同期 | Kotlin Coroutines + Flow |
-| HTTP クライアント | Ktor Client (OkHttp エンジン) |
-| 認証状態管理 | DataStore Preferences |
-| 音声録音 | MediaRecorder API |
-| ファイル管理 | MediaStore / FileProvider |
+| 言語 | Dart |
+| フレームワーク | Flutter |
+| 最小 SDK | Android API 26 (Android 8.0) |
+| ターゲット SDK | Android API 35 (Android 15) |
+| アーキテクチャ | Riverpod + Repository パターン |
+| UI | Flutter Material 3 Widgets |
+| 状態管理 | flutter_riverpod |
+| 非同期 | Dart async / await + Stream |
+| HTTP クライアント | dio |
+| 認証状態管理 | flutter_secure_storage |
+| 音声録音 | record パッケージ |
+| 音声再生 | just_audio パッケージ |
+| ファイル管理 | path_provider + file_picker |
+| 権限管理 | permission_handler |
 
 ---
 
@@ -74,7 +77,7 @@ SplashScreen
 ### 5.1 SplashScreen
 
 - アプリ起動時に表示
-- DataStore に保存済みセッショントークンが有効な場合は HomeScreen へリダイレクト
+- `flutter_secure_storage` に保存済みセッショントークンが有効な場合は HomeScreen へリダイレクト
 - トークンが無い・無効の場合は LoginScreen へ遷移
 
 ---
@@ -94,7 +97,7 @@ SplashScreen
 **ログイン処理フロー**
 
 1. `POST /api/auth/sign-in/email` へリクエスト
-2. レスポンスの Set-Cookie ヘッダーからセッション Cookie を取得し DataStore に保存
+2. レスポンスの Set-Cookie ヘッダーからセッション Cookie を取得し `flutter_secure_storage` に保存
 3. 成功 → HomeScreen へ遷移
 4. 失敗 → エラーメッセージを画面に表示
 
@@ -141,7 +144,7 @@ SplashScreen
 | ビットレート | 128 kbps |
 | サンプリングレート | 44,100 Hz |
 | チャンネル | モノラル |
-| 保存先 | アプリ専用ストレージ (`context.filesDir/recordings/`) |
+| 保存先 | アプリ専用ストレージ (`getApplicationDocumentsDirectory()/recordings/`) |
 
 ---
 
@@ -165,14 +168,14 @@ SplashScreen
 
 **スラッグ自動生成ロジック**
 
-```kotlin
-fun titleToSlug(title: String): String {
-    return title
-        .lowercase()
-        .replace(Regex("[\\s_]+"), "-")
-        .replace(Regex("[^a-z0-9-]"), "")
-        .replace(Regex("-{2,}"), "-")
-        .take(100)
+```dart
+String titleToSlug(String title) {
+  return title
+      .toLowerCase()
+      .replaceAll(RegExp(r'[\s_]+'), '-')
+      .replaceAll(RegExp(r'[^a-z0-9-]'), '')
+      .replaceAll(RegExp(r'-{2,}'), '-')
+      .substring(0, title.length > 100 ? 100 : title.length);
 }
 ```
 
@@ -184,7 +187,7 @@ fun titleToSlug(title: String): String {
 
 | 要素 | 説明 |
 |------|------|
-| カテゴリ一覧 (LazyColumn) | API から取得したカテゴリをチェックボックス付きで一覧表示 |
+| カテゴリ一覧 (ListView) | API から取得したカテゴリをチェックボックス付きで一覧表示 |
 | 検索バー | カテゴリ名でフィルタリング |
 | 決定ボタン | 選択内容を MetadataScreen に返して戻る |
 
@@ -353,7 +356,7 @@ file: <音声ファイルバイナリ>
 ## 8. セキュリティ要件
 
 - HTTPS 通信のみ許可 (HTTP は開発環境のみ例外)
-- セッション Cookie は DataStore に暗号化保存 (`EncryptedSharedPreferences` と同等)
+- セッション Cookie は `flutter_secure_storage` に暗号化保存
 - 録音ファイルはアプリ専用ストレージに保存しアップロード完了後に削除
 - Certificate Pinning は本番リリース時に検討
 
