@@ -103,6 +103,9 @@ async function listPodcastsWithCategories(
         ? podcast.createdAt
         : podcast.publishedAt;
   const orderExpr = order === "asc" ? asc(sortCol) : desc(sortCol);
+  // sortCol が createdAt と同一の場合、二重ソートを避けるためセカンダリキーを省略する
+  const orderClauses =
+    sortBy === "createdAt" ? [orderExpr] : [orderExpr, desc(podcast.createdAt)];
 
   const rows = await db
     .select({ podcast, category })
@@ -110,7 +113,7 @@ async function listPodcastsWithCategories(
     .leftJoin(podcastCategory, eq(podcastCategory.podcastId, podcast.id))
     .leftJoin(category, eq(category.id, podcastCategory.categoryId))
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(orderExpr, desc(podcast.createdAt));
+    .orderBy(...orderClauses);
 
   const map = new Map<
     string,
