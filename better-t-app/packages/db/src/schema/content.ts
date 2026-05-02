@@ -180,12 +180,78 @@ export const postRelations = relations(post, ({ many }) => ({
 
 export const categoryRelations = relations(category, ({ many }) => ({
   postCategories: many(postCategory),
+  podcastCategories: many(podcastCategory),
 }));
 
 export const postCategoryRelations = relations(postCategory, ({ one }) => ({
   post: one(post, { fields: [postCategory.postId], references: [post.id] }),
   category: one(category, {
     fields: [postCategory.categoryId],
+    references: [category.id],
+  }),
+}));
+
+// ── Podcast ───────────────────────────────────────────────────────────────────
+
+export const podcast = sqliteTable(
+  "podcast",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull().unique(),
+    description: text("description").notNull().default(""),
+    audioUrl: text("audio_url").notNull(),
+    duration: integer("duration"),
+    fileSize: integer("file_size"),
+    mimeType: text("mime_type"),
+    isPublished: integer("is_published", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    publishedAt: integer("published_at", { mode: "timestamp_ms" }),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("podcast_slug_idx").on(table.slug),
+    index("podcast_is_published_idx").on(table.isPublished),
+    index("podcast_published_at_idx").on(table.publishedAt),
+  ],
+);
+
+// ── PodcastCategory (junction) ────────────────────────────────────────────────
+
+export const podcastCategory = sqliteTable(
+  "podcast_category",
+  {
+    podcastId: text("podcast_id")
+      .notNull()
+      .references(() => podcast.id, { onDelete: "cascade" }),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => category.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.podcastId, table.categoryId] })],
+);
+
+// ── Podcast / Category Relations ──────────────────────────────────────────────
+
+export const podcastRelations = relations(podcast, ({ many }) => ({
+  podcastCategories: many(podcastCategory),
+}));
+
+export const podcastCategoryRelations = relations(podcastCategory, ({ one }) => ({
+  podcast: one(podcast, {
+    fields: [podcastCategory.podcastId],
+    references: [podcast.id],
+  }),
+  category: one(category, {
+    fields: [podcastCategory.categoryId],
     references: [category.id],
   }),
 }));

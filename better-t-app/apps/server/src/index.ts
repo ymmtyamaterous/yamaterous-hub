@@ -47,6 +47,57 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+// 音声アップロードエンドポイント
+const ALLOWED_AUDIO_MIME_TYPES = new Set([
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/x-m4a",
+  "audio/m4a",
+]);
+const MAX_AUDIO_SIZE = 500 * 1024 * 1024; // 500MB
+
+app.post("/api/upload/audio", async (c) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  let formData: FormData;
+  try {
+    formData = await c.req.formData();
+  } catch {
+    return c.json({ error: "Invalid form data" }, 400);
+  }
+
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return c.json({ error: "No file provided" }, 400);
+  }
+
+  if (!ALLOWED_AUDIO_MIME_TYPES.has(file.type)) {
+    return c.json({ error: "Invalid file type. Allowed: mp3, m4a" }, 400);
+  }
+
+  if (file.size > MAX_AUDIO_SIZE) {
+    return c.json({ error: "File too large (max 500MB)" }, 400);
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "m4a";
+  const safeName = `${Date.now()}-${randomBytes(8).toString("hex")}.${ext}`;
+  const audioDir = join(uploadsDir, "audio");
+  await mkdir(audioDir, { recursive: true });
+  const destPath = join(audioDir, safeName);
+
+  const buffer = await file.arrayBuffer();
+  await Bun.write(destPath, buffer);
+
+  return c.json({
+    url: `/uploads/audio/${safeName}`,
+    fileSize: file.size,
+    mimeType: file.type,
+  });
+});
+
 app.post("/api/upload", async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {

@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: "/", label: "HOME" },
   { to: "/works", label: "WORKS" },
   { to: "/blog", label: "BLOG" },
+  { to: "/podcast", label: "PODCAST" },
 ] as const;
 
 export default function Header() {
