@@ -19,7 +19,9 @@ export async function runMigrationsAndSeed() {
   const migrationsFolder =
     process.env.MIGRATIONS_FOLDER ??
     resolve(__dirname, "../../../packages/db/src/migrations");
+  console.log(`[db] Running migrations from: ${migrationsFolder}`);
   await migrate(db, { migrationsFolder });
+  console.log("[db] Migrations applied.");
 
   // シード: profile が存在しなければ初期レコードを挿入
   const existingProfile = await db.select().from(profile).limit(1);

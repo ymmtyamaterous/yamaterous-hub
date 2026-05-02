@@ -44,6 +44,8 @@ WORKDIR /app
 # マイグレーションフォルダを明示的に指定する環境変数
 # runMigrations() はこの変数を優先して参照する
 ENV MIGRATIONS_FOLDER=/app/migrations
+# DB ファイル格納ディレクトリを作成（ボリュームマウント前に存在を保証）
+RUN mkdir -p /app/data
 # フロントエンド (SPA 静的ファイル)
 COPY --from=builder /app/apps/web/dist ./web
 # バックエンド (バンドル済みサーバー - better-auth/hono/@orpc/drizzle-orm 等は全てインライン済み)
