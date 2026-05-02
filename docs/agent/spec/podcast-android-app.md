@@ -193,7 +193,7 @@ String titleToSlug(String title) {
 
 **データ取得**
 
-- `GET /rpc/categories.list` でカテゴリ一覧を取得
+- `POST /rpc/categories/list` でカテゴリ一覧を取得
 - 画面表示時に毎回取得 (キャッシュ TTL: 5 分)
 
 ---
@@ -218,7 +218,7 @@ String titleToSlug(String title) {
    - フィールド: file (音声ファイル)
    → レスポンス: { url: "/uploads/audio/xxx.m4a", duration: 1234 }
 
-2. POST /rpc/podcasts.create  (oRPC)
+2. POST /rpc/podcasts/create  (oRPC)
    - title, slug, description, audioUrl, duration, isPublished, categoryIds
    → レスポンス: { id, slug, ... }
 
@@ -292,7 +292,7 @@ file: <音声ファイルバイナリ>
 
 | エンドポイント | メソッド | 認証 |
 |---------------|--------|------|
-| `/rpc/categories.list` | POST | 不要 |
+| `/rpc/categories/list` | POST | 不要 |
 
 **レスポンス**
 
@@ -307,7 +307,7 @@ file: <音声ファイルバイナリ>
 
 | エンドポイント | メソッド | 認証 |
 |---------------|--------|------|
-| `/rpc/podcasts.create` | POST | 必須 |
+| `/rpc/podcasts/create` | POST | 必須 |
 
 **リクエスト**
 
