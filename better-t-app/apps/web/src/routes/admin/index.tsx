@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { orpc } from "@/utils/orpc";
 
@@ -71,6 +72,14 @@ function StatCard({
   );
 }
 
+type SortMode = "total" | "admin" | "public";
+
+const SORT_OPTIONS: { mode: SortMode; label: string }[] = [
+  { mode: "total", label: "総計" },
+  { mode: "admin", label: "管理者" },
+  { mode: "public", label: "一般" },
+];
+
 function RankingTable({
   title,
   rows,
@@ -86,19 +95,85 @@ function RankingTable({
   adminCountKey?: string;
   publicCountKey?: string;
 }) {
+  const [sortMode, setSortMode] = useState<SortMode>("total");
+
+  const getSortKey = (mode: SortMode) => {
+    if (mode === "admin" && adminCountKey) return adminCountKey;
+    if (mode === "public" && publicCountKey) return publicCountKey;
+    return countKey;
+  };
+
+  const sortedRows =
+    adminCountKey && publicCountKey
+      ? [...rows].sort((a, b) => {
+          const key = getSortKey(sortMode);
+          return (Number(b[key]) ?? 0) - (Number(a[key]) ?? 0);
+        })
+      : rows;
+
+  const activeSortKey = getSortKey(sortMode);
+
   return (
     <div>
-      <h2
+      <div
         style={{
-          fontFamily: "var(--sc-font-mono)",
-          fontSize: "11px",
-          letterSpacing: "0.15em",
-          color: "var(--sc-sakura)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           marginBottom: "0.75rem",
+          flexWrap: "wrap",
+          gap: "0.5rem",
         }}
       >
-        {title}
-      </h2>
+        <h2
+          style={{
+            fontFamily: "var(--sc-font-mono)",
+            fontSize: "11px",
+            letterSpacing: "0.15em",
+            color: "var(--sc-sakura)",
+          }}
+        >
+          {title}
+        </h2>
+        {adminCountKey && publicCountKey && (
+          <div
+            style={{
+              display: "flex",
+              gap: "0.25rem",
+            }}
+          >
+            {SORT_OPTIONS.map(({ mode, label }) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setSortMode(mode)}
+                style={{
+                  fontFamily: "var(--sc-font-mono)",
+                  fontSize: "10px",
+                  letterSpacing: "0.08em",
+                  padding: "0.2rem 0.6rem",
+                  border: "1px solid",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  borderColor:
+                    sortMode === mode
+                      ? "var(--sc-cyber)"
+                      : "rgba(200,0,90,0.2)",
+                  background:
+                    sortMode === mode
+                      ? "var(--sc-cyber)"
+                      : "transparent",
+                  color:
+                    sortMode === mode ? "#fff" : "var(--sc-muted)",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <div
         style={{
           background: "rgba(253,246,239,0.9)",
@@ -108,7 +183,7 @@ function RankingTable({
         }}
         className="dark:!bg-neutral-800/80 dark:!border-pink-900/20"
       >
-        {rows.length === 0 ? (
+        {sortedRows.length === 0 ? (
           <div
             style={{
               padding: "1.5rem",
@@ -123,7 +198,7 @@ function RankingTable({
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <tbody>
-              {rows.map((row, i) => (
+              {sortedRows.map((row, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: ランキング行はインデックスで管理
                 <tr
                   key={i}
@@ -164,7 +239,7 @@ function RankingTable({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {String(row[countKey])}
+                    {String(row[activeSortKey])}
                   </td>
                   {adminCountKey && publicCountKey && (
                     <td
