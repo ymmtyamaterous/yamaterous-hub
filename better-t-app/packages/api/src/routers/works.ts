@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, max } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@better-t-app/db";
@@ -154,6 +154,15 @@ export const worksRouter = {
     .output(WorkOutput)
     .handler(async ({ input }) => {
       const id = generateId();
+
+      let sortOrder = input.sortOrder;
+      if (sortOrder === undefined) {
+        const result = await db
+          .select({ maxOrder: max(work.sortOrder) })
+          .from(work);
+        sortOrder = (result[0]?.maxOrder ?? 0) + 1;
+      }
+
       await db.insert(work).values({
         id,
         title: input.title,
@@ -163,7 +172,7 @@ export const worksRouter = {
         repositoryUrl: input.repositoryUrl ?? null,
         isPublished: input.isPublished ?? false,
         publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
-        sortOrder: input.sortOrder ?? 0,
+        sortOrder,
       });
 
       if (input.tagIds && input.tagIds.length > 0) {

@@ -101,6 +101,23 @@ describe("worksRouter", () => {
     expect(result.title).toBe("新しい作品");
     expect(result.tags).toHaveLength(0);
   });
+  test("create: sortOrder 未指定時に既存最大値 +1 が自動設定される", async () => {
+    await testDb.insert(schema.work).values([
+      { id: "auto-w1", title: "既存1", description: "説明", isPublished: false, sortOrder: 3 },
+      { id: "auto-w2", title: "既存2", description: "説明", isPublished: false, sortOrder: 7 },
+    ]);
+    const result = await call(worksRouter.create, { title: "自動順序", description: "説明" }, authCtx);
+    expect(result.sortOrder).toBe(8);
+  });
+  test("create: sortOrder 未指定かつ作品が存在しない場合は 1 が設定される", async () => {
+    const result = await call(worksRouter.create, { title: "初回作品", description: "説明" }, authCtx);
+    expect(result.sortOrder).toBe(1);
+  });
+  test("create: sortOrder を明示指定した場合はその値が使われる", async () => {
+    await testDb.insert(schema.work).values({ id: "existing", title: "既存", description: "説明", isPublished: false, sortOrder: 10 });
+    const result = await call(worksRouter.create, { title: "指定順序", description: "説明", sortOrder: 5 }, authCtx);
+    expect(result.sortOrder).toBe(5);
+  });
   test("create: タグ付きで作品を作成できる", async () => {
     await testDb.insert(schema.tag).values({ id: "tag-ts", name: "TypeScript" });
     const result = await call(worksRouter.create, { title: "タグ付き作品", description: "説明", tagIds: ["tag-ts"] }, authCtx);
@@ -171,6 +188,58 @@ describe("analyticsRouter", () => {
     expect(stats.totalPageViews).toBe(3);
     expect(stats.topPaths[0].path).toBe("/works");
     expect(stats.topPaths[0].count).toBe(3);
+  });
+
+  test("trackPageView: 未認証は isAdmin=false で記録される", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(1);
+    expect(stats.adminPageViews).toBe(0);
+    expect(stats.publicPageViews).toBe(1);
+    expect(stats.topPaths[0].adminCount).toBe(0);
+    expect(stats.topPaths[0].publicCount).toBe(1);
+  });
+
+  test("trackPageView: 認証済みは isAdmin=true で記録される", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, authCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(1);
+    expect(stats.adminPageViews).toBe(1);
+    expect(stats.publicPageViews).toBe(0);
+    expect(stats.topPaths[0].adminCount).toBe(1);
+    expect(stats.topPaths[0].publicCount).toBe(0);
+  });
+
+  test("trackPageView: 管理者と一般の混在を正しく集計できる", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, authCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(3);
+    expect(stats.adminPageViews).toBe(1);
+    expect(stats.publicPageViews).toBe(2);
+    expect(stats.topPaths[0].count).toBe(3);
+    expect(stats.topPaths[0].adminCount).toBe(1);
+    expect(stats.topPaths[0].publicCount).toBe(2);
+  });
+
+  test("trackClick: 未認証は isAdmin=false で記録される", async () => {
+    await call(analyticsRouter.trackClick, { eventType: "work_click", targetId: "w1", targetTitle: "作品A" }, publicCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.topWorkClicks[0].adminCount).toBe(0);
+    expect(stats.topWorkClicks[0].publicCount).toBe(1);
+  });
+
+  test("trackClick: 認証済みは isAdmin=true で記録される", async () => {
+    await call(analyticsRouter.trackClick, { eventType: "work_click", targetId: "w1", targetTitle: "作品A" }, authCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.topWorkClicks[0].adminCount).toBe(1);
+    expect(stats.topWorkClicks[0].publicCount).toBe(0);
   });
 });
 

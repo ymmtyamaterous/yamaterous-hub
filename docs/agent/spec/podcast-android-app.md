@@ -193,7 +193,7 @@ String titleToSlug(String title) {
 
 **データ取得**
 
-- `GET /rpc/categories.list` でカテゴリ一覧を取得
+- `POST /rpc/categories/list` でカテゴリ一覧を取得
 - 画面表示時に毎回取得 (キャッシュ TTL: 5 分)
 
 ---
@@ -216,11 +216,12 @@ String titleToSlug(String title) {
 1. POST /api/upload/audio
    - Content-Type: multipart/form-data
    - フィールド: file (音声ファイル)
-   → レスポンス: { url: "/uploads/audio/xxx.m4a", duration: 1234 }
+   → レスポンス: { url: "/uploads/audio/xxx.m4a", fileSize: 12345678, mimeType: "audio/mp4" }
 
-2. POST /rpc/podcasts.create  (oRPC)
-   - title, slug, description, audioUrl, duration, isPublished, categoryIds
-   → レスポンス: { id, slug, ... }
+2. POST /rpc/podcasts/create  (oRPC)
+   - Content-Type: application/json
+   - Body: { "json": { title, slug, description, audioUrl, duration, fileSize, mimeType, isPublished, categoryIds } }
+   → レスポンス: { "json": { id, slug, ... } }
 
 3. 成功ダイアログを表示して HomeScreen へ遷移
 ```
@@ -284,59 +285,81 @@ file: <音声ファイルバイナリ>
 ```json
 {
   "url": "/uploads/audio/1746091234-abc123def456.m4a",
-  "duration": 3672
+  "fileSize": 12345678,
+  "mimeType": "audio/mp4"
 }
 ```
+
+> **注意**: レスポンスに `duration` は含まれません。`duration` はアプリ側で録音時間から計算して `podcasts.create` に渡してください。
 
 ### 6.3 カテゴリ一覧取得
 
 | エンドポイント | メソッド | 認証 |
 |---------------|--------|------|
-| `/rpc/categories.list` | POST | 不要 |
+| `/rpc/categories/list` | POST | 不要 |
+
+> **oRPC ワイヤーフォーマット**: すべての oRPC エンドポイントはリクエストボディを `{ "json": <input> }` で包む必要があります。入力がない場合は空オブジェクト `{}` を送信してください。
+
+**リクエスト (Content-Type: application/json)**
+
+```json
+{}
+```
 
 **レスポンス**
 
 ```json
-[
-  { "id": "cat-1", "name": "テクノロジー", "slug": "technology", "description": "..." },
-  ...
-]
+{
+  "json": [
+    { "id": "cat-1", "name": "テクノロジー", "slug": "technology", "description": "...", "createdAt": "...", "updatedAt": "..." }
+  ]
+}
 ```
 
 ### 6.4 ポッドキャスト作成
 
 | エンドポイント | メソッド | 認証 |
 |---------------|--------|------|
-| `/rpc/podcasts.create` | POST | 必須 |
+| `/rpc/podcasts/create` | POST | 必須 |
 
-**リクエスト**
+**リクエスト (Content-Type: application/json)**
 
 ```json
 {
-  "title": "エピソード1: はじめまして",
-  "slug": "episode-1",
-  "description": "自己紹介回です",
-  "audioUrl": "/uploads/audio/xxx.m4a",
-  "duration": 3672,
-  "isPublished": true,
-  "categoryIds": ["cat-1"]
+  "json": {
+    "title": "エピソード1: はじめまして",
+    "slug": "episode-1",
+    "description": "自己紹介回です",
+    "audioUrl": "/uploads/audio/xxx.m4a",
+    "duration": 3672,
+    "fileSize": 12345678,
+    "mimeType": "audio/mp4",
+    "isPublished": true,
+    "categoryIds": ["cat-1"]
+  }
 }
 ```
+
+> **注意**: `duration` はアプリ側で録音時間(秒)を整数で計算して渡してください。`fileSize` と `mimeType` は `/api/upload/audio` のレスポンスから取得できます。
 
 **レスポンス**
 
 ```json
 {
-  "id": "ep-uuid",
-  "title": "エピソード1: はじめまして",
-  "slug": "episode-1",
-  "audioUrl": "/uploads/audio/xxx.m4a",
-  "duration": 3672,
-  "isPublished": true,
-  "publishedAt": "2026-05-01T00:00:00.000Z",
-  "createdAt": "2026-05-01T00:00:00.000Z",
-  "updatedAt": "2026-05-01T00:00:00.000Z",
-  "categories": [{ "id": "cat-1", "name": "テクノロジー", "slug": "technology" }]
+  "json": {
+    "id": "ep-uuid",
+    "title": "エピソード1: はじめまして",
+    "slug": "episode-1",
+    "audioUrl": "/uploads/audio/xxx.m4a",
+    "duration": 3672,
+    "fileSize": 12345678,
+    "mimeType": "audio/mp4",
+    "isPublished": true,
+    "publishedAt": "2026-05-01T00:00:00.000Z",
+    "createdAt": "2026-05-01T00:00:00.000Z",
+    "updatedAt": "2026-05-01T00:00:00.000Z",
+    "categories": [{ "id": "cat-1", "name": "テクノロジー", "slug": "technology" }]
+  }
 }
 ```
 

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { orpc } from "@/utils/orpc";
 
@@ -71,30 +72,108 @@ function StatCard({
   );
 }
 
+type SortMode = "total" | "admin" | "public";
+
+const SORT_OPTIONS: { mode: SortMode; label: string }[] = [
+  { mode: "total", label: "総計" },
+  { mode: "admin", label: "管理者" },
+  { mode: "public", label: "一般" },
+];
+
 function RankingTable({
   title,
   rows,
   labelKey,
   countKey,
+  adminCountKey,
+  publicCountKey,
 }: {
   title: string;
   rows: Record<string, unknown>[];
   labelKey: string;
   countKey: string;
+  adminCountKey?: string;
+  publicCountKey?: string;
 }) {
+  const [sortMode, setSortMode] = useState<SortMode>("total");
+
+  const getSortKey = (mode: SortMode) => {
+    if (mode === "admin" && adminCountKey) return adminCountKey;
+    if (mode === "public" && publicCountKey) return publicCountKey;
+    return countKey;
+  };
+
+  const sortedRows =
+    adminCountKey && publicCountKey
+      ? [...rows].sort((a, b) => {
+          const key = getSortKey(sortMode);
+          return (Number(b[key]) ?? 0) - (Number(a[key]) ?? 0);
+        })
+      : rows;
+
+  const activeSortKey = getSortKey(sortMode);
+
   return (
     <div>
-      <h2
+      <div
         style={{
-          fontFamily: "var(--sc-font-mono)",
-          fontSize: "11px",
-          letterSpacing: "0.15em",
-          color: "var(--sc-sakura)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           marginBottom: "0.75rem",
+          flexWrap: "wrap",
+          gap: "0.5rem",
         }}
       >
-        {title}
-      </h2>
+        <h2
+          style={{
+            fontFamily: "var(--sc-font-mono)",
+            fontSize: "11px",
+            letterSpacing: "0.15em",
+            color: "var(--sc-sakura)",
+          }}
+        >
+          {title}
+        </h2>
+        {adminCountKey && publicCountKey && (
+          <div
+            style={{
+              display: "flex",
+              gap: "0.25rem",
+            }}
+          >
+            {SORT_OPTIONS.map(({ mode, label }) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setSortMode(mode)}
+                style={{
+                  fontFamily: "var(--sc-font-mono)",
+                  fontSize: "10px",
+                  letterSpacing: "0.08em",
+                  padding: "0.2rem 0.6rem",
+                  border: "1px solid",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  borderColor:
+                    sortMode === mode
+                      ? "var(--sc-cyber)"
+                      : "rgba(200,0,90,0.2)",
+                  background:
+                    sortMode === mode
+                      ? "var(--sc-cyber)"
+                      : "transparent",
+                  color:
+                    sortMode === mode ? "#fff" : "var(--sc-muted)",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <div
         style={{
           background: "rgba(253,246,239,0.9)",
@@ -104,7 +183,7 @@ function RankingTable({
         }}
         className="dark:!bg-neutral-800/80 dark:!border-pink-900/20"
       >
-        {rows.length === 0 ? (
+        {sortedRows.length === 0 ? (
           <div
             style={{
               padding: "1.5rem",
@@ -119,7 +198,7 @@ function RankingTable({
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <tbody>
-              {rows.map((row, i) => (
+              {sortedRows.map((row, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: ランキング行はインデックスで管理
                 <tr
                   key={i}
@@ -160,8 +239,27 @@ function RankingTable({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {String(row[countKey])}
+                    {String(row[activeSortKey])}
                   </td>
+                  {adminCountKey && publicCountKey && (
+                    <td
+                      style={{
+                        padding: "0.6rem 1rem",
+                        fontFamily: "var(--sc-font-mono)",
+                        fontSize: "11px",
+                        color: "var(--sc-muted)",
+                        textAlign: "right",
+                        whiteSpace: "nowrap",
+                      }}
+                      className="dark:!text-neutral-500"
+                    >
+                      <span style={{ color: "var(--sc-sakura)" }}>
+                        管理者:{String(row[adminCountKey])}
+                      </span>
+                      {" / "}
+                      <span>一般:{String(row[publicCountKey])}</span>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -282,6 +380,18 @@ function AdminDashboard() {
               color="var(--sc-cyber)"
             />
             <StatCard
+              label="管理者PV"
+              value={analytics?.adminPageViews ?? 0}
+              color="var(--sc-sakura)"
+              sub="管理者によるアクセス"
+            />
+            <StatCard
+              label="一般PV"
+              value={analytics?.publicPageViews ?? 0}
+              color="var(--sc-cyber)"
+              sub="一般ユーザーによるアクセス"
+            />
+            <StatCard
               label="今日のPV"
               value={analytics?.todayPageViews ?? 0}
               color="var(--sc-sakura)"
@@ -309,18 +419,24 @@ function AdminDashboard() {
               rows={(analytics?.topPaths ?? []) as Record<string, unknown>[]}
               labelKey="path"
               countKey="count"
+              adminCountKey="adminCount"
+              publicCountKey="publicCount"
             />
             <RankingTable
               title="// TOP WORK CLICKS"
               rows={(analytics?.topWorkClicks ?? []) as Record<string, unknown>[]}
               labelKey="targetTitle"
               countKey="count"
+              adminCountKey="adminCount"
+              publicCountKey="publicCount"
             />
             <RankingTable
               title="// TOP POST CLICKS"
               rows={(analytics?.topPostClicks ?? []) as Record<string, unknown>[]}
               labelKey="targetTitle"
               countKey="count"
+              adminCountKey="adminCount"
+              publicCountKey="publicCount"
             />
           </div>
         </>

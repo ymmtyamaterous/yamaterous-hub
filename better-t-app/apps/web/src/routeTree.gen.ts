@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminLoginHubRouteImport } from './routes/admin-login-hub'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -32,6 +33,11 @@ import { Route as AdminWorksWorkIdEditRouteImport } from './routes/admin/works/$
 import { Route as AdminPostsPostIdEditRouteImport } from './routes/admin/posts/$postId/edit'
 import { Route as AdminPodcastsEpisodeIdEditRouteImport } from './routes/admin/podcasts/$episodeId/edit'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/admin-login-hub': typeof AdminLoginHubRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-login-hub'
     | '/dashboard'
+    | '/profile'
     | '/admin/profile'
     | '/admin/site'
     | '/blog/$slug'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-login-hub'
     | '/dashboard'
+    | '/profile'
     | '/admin/profile'
     | '/admin/site'
     | '/blog/$slug'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-login-hub'
     | '/dashboard'
+    | '/profile'
     | '/admin/profile'
     | '/admin/site'
     | '/blog/$slug'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AdminLoginHubRoute: typeof AdminLoginHubRoute
   DashboardRoute: typeof DashboardRoute
+  ProfileRoute: typeof ProfileRoute
   BlogSlugRoute: typeof BlogSlugRoute
   WorksWorkIdRoute: typeof WorksWorkIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -304,6 +317,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -500,6 +520,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AdminLoginHubRoute: AdminLoginHubRoute,
   DashboardRoute: DashboardRoute,
+  ProfileRoute: ProfileRoute,
   BlogSlugRoute: BlogSlugRoute,
   WorksWorkIdRoute: WorksWorkIdRoute,
   BlogIndexRoute: BlogIndexRoute,
