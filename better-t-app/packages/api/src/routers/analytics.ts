@@ -1,4 +1,4 @@
-import { and, count, desc, gte, sql } from "drizzle-orm";
+import { and, count, desc, gte, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@better-t-app/db";
@@ -33,13 +33,15 @@ export const analyticsRouter = {
       }),
     )
     .output(z.object({ ok: z.boolean() }))
-    .handler(async ({ input }) => {
+    .handler(async ({ input, context }) => {
+      const isAdmin = context.session?.user != null ? true : false;
       await db.insert(pageView).values({
         id: generateId(),
         path: input.path,
         referrer: input.referrer ?? null,
         ipHash: input.ipHash ?? null,
         userAgent: input.userAgent ?? null,
+        isAdmin,
       });
       return { ok: true };
     }),
@@ -53,12 +55,14 @@ export const analyticsRouter = {
       }),
     )
     .output(z.object({ ok: z.boolean() }))
-    .handler(async ({ input }) => {
+    .handler(async ({ input, context }) => {
+      const isAdmin = context.session?.user != null ? true : false;
       await db.insert(clickEvent).values({
         id: generateId(),
         eventType: input.eventType,
         targetId: input.targetId,
         targetTitle: input.targetTitle,
+        isAdmin,
       });
       return { ok: true };
     }),
@@ -69,16 +73,25 @@ export const analyticsRouter = {
     .output(
       z.object({
         totalPageViews: z.number(),
+        adminPageViews: z.number(),
+        publicPageViews: z.number(),
         todayPageViews: z.number(),
         weekPageViews: z.number(),
         topPaths: z.array(
-          z.object({ path: z.string(), count: z.number() }),
+          z.object({
+            path: z.string(),
+            count: z.number(),
+            adminCount: z.number(),
+            publicCount: z.number(),
+          }),
         ),
         topWorkClicks: z.array(
           z.object({
             targetId: z.string(),
             targetTitle: z.string(),
             count: z.number(),
+            adminCount: z.number(),
+            publicCount: z.number(),
           }),
         ),
         topPostClicks: z.array(
@@ -86,6 +99,8 @@ export const analyticsRouter = {
             targetId: z.string(),
             targetTitle: z.string(),
             count: z.number(),
+            adminCount: z.number(),
+            publicCount: z.number(),
           }),
         ),
       }),
@@ -97,6 +112,11 @@ export const analyticsRouter = {
       const [totalResult] = await db
         .select({ value: count() })
         .from(pageView);
+
+      const [adminTotalResult] = await db
+        .select({ value: count() })
+        .from(pageView)
+        .where(sql`${pageView.isAdmin} = 1`);
 
       const [todayResult] = await db
         .select({ value: count() })
@@ -112,6 +132,8 @@ export const analyticsRouter = {
         .select({
           path: pageView.path,
           count: count(),
+          adminCount: sql<number>`coalesce(sum(case when ${pageView.isAdmin} = 1 then 1 else 0 end), 0)`,
+          publicCount: sql<number>`coalesce(sum(case when ${pageView.isAdmin} = 1 then 0 else 1 end), 0)`,
         })
         .from(pageView)
         .groupBy(pageView.path)
@@ -123,6 +145,8 @@ export const analyticsRouter = {
           targetId: clickEvent.targetId,
           targetTitle: clickEvent.targetTitle,
           count: count(),
+          adminCount: sql<number>`coalesce(sum(case when ${clickEvent.isAdmin} = 1 then 1 else 0 end), 0)`,
+          publicCount: sql<number>`coalesce(sum(case when ${clickEvent.isAdmin} = 1 then 0 else 1 end), 0)`,
         })
         .from(clickEvent)
         .where(and(sql`${clickEvent.eventType} = 'work_click'`))
@@ -135,6 +159,8 @@ export const analyticsRouter = {
           targetId: clickEvent.targetId,
           targetTitle: clickEvent.targetTitle,
           count: count(),
+          adminCount: sql<number>`coalesce(sum(case when ${clickEvent.isAdmin} = 1 then 1 else 0 end), 0)`,
+          publicCount: sql<number>`coalesce(sum(case when ${clickEvent.isAdmin} = 1 then 0 else 1 end), 0)`,
         })
         .from(clickEvent)
         .where(and(sql`${clickEvent.eventType} = 'post_click'`))
@@ -142,20 +168,34 @@ export const analyticsRouter = {
         .orderBy(desc(count()))
         .limit(10);
 
+      const total = totalResult?.value ?? 0;
+      const adminTotal = adminTotalResult?.value ?? 0;
+
       return {
-        totalPageViews: totalResult?.value ?? 0,
+        totalPageViews: total,
+        adminPageViews: adminTotal,
+        publicPageViews: total - adminTotal,
         todayPageViews: todayResult?.value ?? 0,
         weekPageViews: weekResult?.value ?? 0,
-        topPaths: topPaths.map((r) => ({ path: r.path, count: r.count })),
+        topPaths: topPaths.map((r) => ({
+          path: r.path,
+          count: r.count,
+          adminCount: r.adminCount,
+          publicCount: r.publicCount,
+        })),
         topWorkClicks: topWorkClicks.map((r) => ({
           targetId: r.targetId,
           targetTitle: r.targetTitle,
           count: r.count,
+          adminCount: r.adminCount,
+          publicCount: r.publicCount,
         })),
         topPostClicks: topPostClicks.map((r) => ({
           targetId: r.targetId,
           targetTitle: r.targetTitle,
           count: r.count,
+          adminCount: r.adminCount,
+          publicCount: r.publicCount,
         })),
       };
     }),

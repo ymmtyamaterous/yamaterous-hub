@@ -189,6 +189,58 @@ describe("analyticsRouter", () => {
     expect(stats.topPaths[0].path).toBe("/works");
     expect(stats.topPaths[0].count).toBe(3);
   });
+
+  test("trackPageView: 未認証は isAdmin=false で記録される", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(1);
+    expect(stats.adminPageViews).toBe(0);
+    expect(stats.publicPageViews).toBe(1);
+    expect(stats.topPaths[0].adminCount).toBe(0);
+    expect(stats.topPaths[0].publicCount).toBe(1);
+  });
+
+  test("trackPageView: 認証済みは isAdmin=true で記録される", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, authCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(1);
+    expect(stats.adminPageViews).toBe(1);
+    expect(stats.publicPageViews).toBe(0);
+    expect(stats.topPaths[0].adminCount).toBe(1);
+    expect(stats.topPaths[0].publicCount).toBe(0);
+  });
+
+  test("trackPageView: 管理者と一般の混在を正しく集計できる", async () => {
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, publicCtx);
+    await call(analyticsRouter.trackPageView, { path: "/works", referrer: null }, authCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.totalPageViews).toBe(3);
+    expect(stats.adminPageViews).toBe(1);
+    expect(stats.publicPageViews).toBe(2);
+    expect(stats.topPaths[0].count).toBe(3);
+    expect(stats.topPaths[0].adminCount).toBe(1);
+    expect(stats.topPaths[0].publicCount).toBe(2);
+  });
+
+  test("trackClick: 未認証は isAdmin=false で記録される", async () => {
+    await call(analyticsRouter.trackClick, { eventType: "work_click", targetId: "w1", targetTitle: "作品A" }, publicCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.topWorkClicks[0].adminCount).toBe(0);
+    expect(stats.topWorkClicks[0].publicCount).toBe(1);
+  });
+
+  test("trackClick: 認証済みは isAdmin=true で記録される", async () => {
+    await call(analyticsRouter.trackClick, { eventType: "work_click", targetId: "w1", targetTitle: "作品A" }, authCtx);
+
+    const stats = await call(analyticsRouter.getStats, undefined, authCtx);
+    expect(stats.topWorkClicks[0].adminCount).toBe(1);
+    expect(stats.topWorkClicks[0].publicCount).toBe(0);
+  });
 });
 
 describe("podcastsRouter", () => {

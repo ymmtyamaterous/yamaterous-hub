@@ -266,6 +266,7 @@ export const pageView = sqliteTable(
     referrer: text("referrer"),
     ipHash: text("ip_hash"),
     userAgent: text("user_agent"),
+    isAdmin: integer("is_admin", { mode: "boolean" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -283,6 +284,7 @@ export const clickEvent = sqliteTable(
     eventType: text("event_type").notNull(), // 'work_click' | 'post_click'
     targetId: text("target_id").notNull(),
     targetTitle: text("target_title").notNull(),
+    isAdmin: integer("is_admin", { mode: "boolean" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),

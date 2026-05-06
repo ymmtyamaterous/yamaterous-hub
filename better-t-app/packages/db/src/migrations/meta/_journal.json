@@ -57,6 +57,13 @@
       "when": 1777680000000,
       "tag": "0007_podcasts",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1777800000000,
+      "tag": "0008_analytics_is_admin",
+      "breakpoints": true
     }
   ]
 }

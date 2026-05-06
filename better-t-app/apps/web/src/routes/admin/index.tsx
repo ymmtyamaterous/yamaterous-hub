@@ -76,11 +76,15 @@ function RankingTable({
   rows,
   labelKey,
   countKey,
+  adminCountKey,
+  publicCountKey,
 }: {
   title: string;
   rows: Record<string, unknown>[];
   labelKey: string;
   countKey: string;
+  adminCountKey?: string;
+  publicCountKey?: string;
 }) {
   return (
     <div>
@@ -162,6 +166,25 @@ function RankingTable({
                   >
                     {String(row[countKey])}
                   </td>
+                  {adminCountKey && publicCountKey && (
+                    <td
+                      style={{
+                        padding: "0.6rem 1rem",
+                        fontFamily: "var(--sc-font-mono)",
+                        fontSize: "11px",
+                        color: "var(--sc-muted)",
+                        textAlign: "right",
+                        whiteSpace: "nowrap",
+                      }}
+                      className="dark:!text-neutral-500"
+                    >
+                      <span style={{ color: "var(--sc-sakura)" }}>
+                        管理者:{String(row[adminCountKey])}
+                      </span>
+                      {" / "}
+                      <span>一般:{String(row[publicCountKey])}</span>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -282,6 +305,18 @@ function AdminDashboard() {
               color="var(--sc-cyber)"
             />
             <StatCard
+              label="管理者PV"
+              value={analytics?.adminPageViews ?? 0}
+              color="var(--sc-sakura)"
+              sub="管理者によるアクセス"
+            />
+            <StatCard
+              label="一般PV"
+              value={analytics?.publicPageViews ?? 0}
+              color="var(--sc-cyber)"
+              sub="一般ユーザーによるアクセス"
+            />
+            <StatCard
               label="今日のPV"
               value={analytics?.todayPageViews ?? 0}
               color="var(--sc-sakura)"
@@ -309,18 +344,24 @@ function AdminDashboard() {
               rows={(analytics?.topPaths ?? []) as Record<string, unknown>[]}
               labelKey="path"
               countKey="count"
+              adminCountKey="adminCount"
+              publicCountKey="publicCount"
             />
             <RankingTable
               title="// TOP WORK CLICKS"
               rows={(analytics?.topWorkClicks ?? []) as Record<string, unknown>[]}
               labelKey="targetTitle"
               countKey="count"
+              adminCountKey="adminCount"
+              publicCountKey="publicCount"
             />
             <RankingTable
               title="// TOP POST CLICKS"
               rows={(analytics?.topPostClicks ?? []) as Record<string, unknown>[]}
               labelKey="targetTitle"
               countKey="count"
+              adminCountKey="adminCount"
+              publicCountKey="publicCount"
             />
           </div>
         </>
