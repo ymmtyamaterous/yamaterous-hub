@@ -21,6 +21,13 @@ function AdminCategoriesPage() {
   const [newDesc, setNewDesc] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState({
+    name: "",
+    slug: "",
+    description: "",
+  });
+
   const createMutation = useMutation(
     orpc.categories.create.mutationOptions({
       onSuccess: () => {
@@ -43,6 +50,18 @@ function AdminCategoriesPage() {
         toast.success("カテゴリを削除しました");
       },
       onError: () => toast.error("削除に失敗しました"),
+    }),
+  );
+
+  const updateMutation = useMutation(
+    orpc.categories.update.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries(orpc.categories.list.queryOptions());
+        toast.success("カテゴリを更新しました");
+        setEditingId(null);
+      },
+      onError: (err: { message?: string }) =>
+        toast.error(err?.message ?? "更新に失敗しました"),
     }),
   );
 
@@ -280,60 +299,176 @@ function AdminCategoriesPage() {
                   key={cat.id}
                   style={{ borderBottom: "1px solid rgba(200,0,90,0.06)" }}
                 >
-                  <td
-                    style={{
-                      padding: "0.75rem 1rem",
-                      fontFamily: "var(--sc-font-jp)",
-                      fontSize: "14px",
-                      color: "var(--sc-text)",
-                      fontWeight: 600,
-                    }}
-                    className="dark:!text-neutral-200"
-                  >
-                    {cat.name}
-                  </td>
-                  <td
-                    style={{
-                      padding: "0.75rem 1rem",
-                      fontFamily: "var(--sc-font-mono)",
-                      fontSize: "12px",
-                      color: "var(--sc-cyber)",
-                    }}
-                  >
-                    {cat.slug}
-                  </td>
-                  <td
-                    style={{
-                      padding: "0.75rem 1rem",
-                      fontFamily: "var(--sc-font-jp)",
-                      fontSize: "13px",
-                      color: "var(--sc-muted)",
-                    }}
-                    className="dark:!text-neutral-400"
-                  >
-                    {cat.description || "—"}
-                  </td>
-                  <td style={{ padding: "0.75rem 1rem" }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!confirm(`「${cat.name}」を削除しますか？`)) return;
-                        deleteMutation.mutate({ id: cat.id });
-                      }}
-                      style={{
-                        fontFamily: "var(--sc-font-mono)",
-                        fontSize: "11px",
-                        padding: "3px 10px",
-                        borderRadius: "2px",
-                        border: "1px solid rgba(200,0,90,0.3)",
-                        color: "var(--sc-sakura)",
-                        background: "transparent",
-                        cursor: "pointer",
-                      }}
-                    >
-                      削除
-                    </button>
-                  </td>
+                  {editingId === cat.id ? (
+                    <>
+                      <td style={{ padding: "0.5rem 0.75rem" }}>
+                        <input
+                          style={inputStyle}
+                          value={editValues.name}
+                          onChange={(e) =>
+                            setEditValues((v) => ({ ...v, name: e.target.value }))
+                          }
+                          className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
+                        />
+                      </td>
+                      <td style={{ padding: "0.5rem 0.75rem" }}>
+                        <input
+                          style={inputStyle}
+                          value={editValues.slug}
+                          onChange={(e) =>
+                            setEditValues((v) => ({ ...v, slug: e.target.value }))
+                          }
+                          pattern="[a-z0-9-]+"
+                          title="小文字英数字とハイフンのみ"
+                          className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
+                        />
+                      </td>
+                      <td style={{ padding: "0.5rem 0.75rem" }}>
+                        <input
+                          style={{ ...inputStyle, width: "100%" }}
+                          value={editValues.description}
+                          onChange={(e) =>
+                            setEditValues((v) => ({ ...v, description: e.target.value }))
+                          }
+                          placeholder="説明を入力..."
+                          className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
+                        />
+                      </td>
+                      <td style={{ padding: "0.5rem 0.75rem" }}>
+                        <div style={{ display: "flex", gap: "0.4rem" }}>
+                          <button
+                            type="button"
+                            disabled={updateMutation.isPending}
+                            onClick={() => {
+                              if (!editValues.name.trim() || !editValues.slug.trim()) {
+                                toast.error("名前とスラッグは必須です");
+                                return;
+                              }
+                              updateMutation.mutate({
+                                id: cat.id,
+                                name: editValues.name,
+                                slug: editValues.slug,
+                                description: editValues.description,
+                              });
+                            }}
+                            style={{
+                              fontFamily: "var(--sc-font-mono)",
+                              fontSize: "11px",
+                              padding: "3px 10px",
+                              borderRadius: "2px",
+                              border: "none",
+                              background: updateMutation.isPending
+                                ? "rgba(200,0,90,0.4)"
+                                : "var(--sc-sakura)",
+                              color: "#fff",
+                              cursor: updateMutation.isPending ? "not-allowed" : "pointer",
+                              fontWeight: 700,
+                            }}
+                          >
+                            保存
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingId(null)}
+                            style={{
+                              fontFamily: "var(--sc-font-mono)",
+                              fontSize: "11px",
+                              padding: "3px 10px",
+                              borderRadius: "2px",
+                              border: "1px solid rgba(0,0,0,0.12)",
+                              background: "transparent",
+                              color: "var(--sc-muted)",
+                              cursor: "pointer",
+                            }}
+                          >
+                            キャンセル
+                          </button>
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td
+                        style={{
+                          padding: "0.75rem 1rem",
+                          fontFamily: "var(--sc-font-jp)",
+                          fontSize: "14px",
+                          color: "var(--sc-text)",
+                          fontWeight: 600,
+                        }}
+                        className="dark:!text-neutral-200"
+                      >
+                        {cat.name}
+                      </td>
+                      <td
+                        style={{
+                          padding: "0.75rem 1rem",
+                          fontFamily: "var(--sc-font-mono)",
+                          fontSize: "12px",
+                          color: "var(--sc-cyber)",
+                        }}
+                      >
+                        {cat.slug}
+                      </td>
+                      <td
+                        style={{
+                          padding: "0.75rem 1rem",
+                          fontFamily: "var(--sc-font-jp)",
+                          fontSize: "13px",
+                          color: "var(--sc-muted)",
+                        }}
+                        className="dark:!text-neutral-400"
+                      >
+                        {cat.description || "—"}
+                      </td>
+                      <td style={{ padding: "0.75rem 1rem" }}>
+                        <div style={{ display: "flex", gap: "0.4rem" }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingId(cat.id);
+                              setEditValues({
+                                name: cat.name,
+                                slug: cat.slug,
+                                description: cat.description,
+                              });
+                            }}
+                            style={{
+                              fontFamily: "var(--sc-font-mono)",
+                              fontSize: "11px",
+                              padding: "3px 10px",
+                              borderRadius: "2px",
+                              border: "1px solid var(--sc-cyber)",
+                              color: "var(--sc-cyber)",
+                              background: "transparent",
+                              cursor: "pointer",
+                            }}
+                          >
+                            編集
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!confirm(`「${cat.name}」を削除しますか？`)) return;
+                              deleteMutation.mutate({ id: cat.id });
+                            }}
+                            style={{
+                              fontFamily: "var(--sc-font-mono)",
+                              fontSize: "11px",
+                              padding: "3px 10px",
+                              borderRadius: "2px",
+                              border: "1px solid rgba(200,0,90,0.3)",
+                              color: "var(--sc-sakura)",
+                              background: "transparent",
+                              cursor: "pointer",
+                            }}
+                          >
+                            削除
+                          </button>
+                        </div>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>

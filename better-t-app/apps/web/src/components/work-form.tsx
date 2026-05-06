@@ -18,7 +18,7 @@ export interface WorkFormValues {
   siteUrl: string;
   repositoryUrl: string;
   isPublished: boolean;
-  sortOrder: number;
+  sortOrder: number | undefined;
   tagIds: string[];
 }
 
@@ -65,7 +65,7 @@ export function WorkForm({
     siteUrl: initialValues?.siteUrl ?? "",
     repositoryUrl: initialValues?.repositoryUrl ?? "",
     isPublished: initialValues?.isPublished ?? false,
-    sortOrder: initialValues?.sortOrder ?? 0,
+    sortOrder: initialValues?.sortOrder,
     tagIds: initialValues?.tagIds ?? [],
   });
 
@@ -320,16 +320,17 @@ export function WorkForm({
       <div style={fieldWrapStyle}>
         <Label style={labelStyle}>SORT ORDER</Label>
         <Input
-          value={values.sortOrder}
+          value={values.sortOrder ?? ""}
           onChange={(e) =>
             setValues((v) => ({
               ...v,
-              sortOrder: Number.parseInt(e.target.value) || 0,
+              sortOrder: e.target.value === "" ? undefined : (Number.parseInt(e.target.value) || 0),
             }))
           }
           style={{ ...inputStyle, width: "120px" }}
           type="number"
           min={0}
+          placeholder="自動設定"
         />
       </div>
 
@@ -381,16 +382,38 @@ export function WorkForm({
             value={newTagName}
             onChange={(e) => setNewTagName(e.target.value)}
             onKeyDown={handleAddTag}
-            placeholder="タグ名を入力して Enter"
+            placeholder="新しいタグ名を入力して Enter"
             style={{ ...inputStyle, fontSize: "13px" }}
-            list="tag-suggestions"
           />
-          <datalist id="tag-suggestions">
-            {availableTags.map((t) => (
-              <option key={t.id} value={t.name} />
-            ))}
-          </datalist>
         </div>
+        {/* 既存タグから選択 */}
+        {availableTags.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.25rem" }}>
+            {availableTags.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  setValues((v) => ({ ...v, tagIds: [...v.tagIds, t.id] }))
+                }
+                style={{
+                  fontFamily: "var(--sc-font-mono)",
+                  fontSize: "11px",
+                  letterSpacing: "0.06em",
+                  padding: "3px 8px",
+                  background: "transparent",
+                  border: "1px dashed rgba(200,0,90,0.3)",
+                  borderRadius: "2px",
+                  color: "var(--sc-muted)",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                + {t.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 公開設定 */}
