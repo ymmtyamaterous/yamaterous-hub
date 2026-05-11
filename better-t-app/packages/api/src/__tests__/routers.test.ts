@@ -84,7 +84,7 @@ describe("worksRouter", () => {
       { id: "w1", title: "公開", description: "説明1", isPublished: true, sortOrder: 0 },
       { id: "w2", title: "非公開", description: "説明2", isPublished: false, sortOrder: 1 },
     ]);
-    const result = await call(worksRouter.list, undefined, publicCtx);
+    const result = await call(worksRouter.list, {}, publicCtx);
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe("公開");
   });
@@ -93,8 +93,54 @@ describe("worksRouter", () => {
       { id: "w1", title: "公開", description: "説明1", isPublished: true, sortOrder: 0 },
       { id: "w2", title: "非公開", description: "説明2", isPublished: false, sortOrder: 1 },
     ]);
-    const result = await call(worksRouter.adminList, undefined, authCtx);
+    const result = await call(worksRouter.adminList, {}, authCtx);
     expect(result).toHaveLength(2);
+  });
+  test("list: tagId で公開作品を絞り込める", async () => {
+    await testDb.insert(schema.tag).values([
+      { id: "tag-a", name: "タグA" },
+      { id: "tag-b", name: "タグB" },
+    ]);
+    await testDb.insert(schema.work).values([
+      { id: "w1", title: "タグAの作品", description: "説明1", isPublished: true, sortOrder: 0 },
+      { id: "w2", title: "タグBの作品", description: "説明2", isPublished: true, sortOrder: 1 },
+      { id: "w3", title: "タグなし", description: "説明3", isPublished: true, sortOrder: 2 },
+    ]);
+    await testDb.insert(schema.workTag).values([
+      { workId: "w1", tagId: "tag-a" },
+      { workId: "w2", tagId: "tag-b" },
+    ]);
+    const result = await call(worksRouter.list, { tagId: "tag-a" }, publicCtx);
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("タグAの作品");
+  });
+  test("adminList: tagId で全作品を絞り込める", async () => {
+    await testDb.insert(schema.tag).values([{ id: "tag-x", name: "TagX" }]);
+    await testDb.insert(schema.work).values([
+      { id: "w1", title: "TagX作品", description: "説明1", isPublished: false, sortOrder: 0 },
+      { id: "w2", title: "タグなし", description: "説明2", isPublished: true, sortOrder: 1 },
+    ]);
+    await testDb.insert(schema.workTag).values([{ workId: "w1", tagId: "tag-x" }]);
+    const result = await call(worksRouter.adminList, { tagId: "tag-x" }, authCtx);
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("TagX作品");
+  });
+  test("reorder: 作品の表示順を一括更新できる", async () => {
+    await testDb.insert(schema.work).values([
+      { id: "r1", title: "作品1", description: "説明", isPublished: false, sortOrder: 1 },
+      { id: "r2", title: "作品2", description: "説明", isPublished: false, sortOrder: 2 },
+    ]);
+    const result = await call(
+      worksRouter.reorder,
+      { updates: [{ id: "r1", sortOrder: 2 }, { id: "r2", sortOrder: 1 }] },
+      authCtx,
+    );
+    expect(result.success).toBe(true);
+    const after = await call(worksRouter.adminList, {}, authCtx);
+    const r1 = after.find((w) => w.id === "r1");
+    const r2 = after.find((w) => w.id === "r2");
+    expect(r1?.sortOrder).toBe(2);
+    expect(r2?.sortOrder).toBe(1);
   });
   test("create: 作品を作成できる", async () => {
     const result = await call(worksRouter.create, { title: "新しい作品", description: "詳細説明", isPublished: false }, authCtx);

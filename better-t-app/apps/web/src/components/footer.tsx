@@ -1,3 +1,5 @@
+import { env } from "@better-t-app/env/web";
+
 export default function Footer() {
   return (
     <footer
@@ -23,6 +25,19 @@ export default function Footer() {
       >
         © {new Date().getFullYear()}{" "}
         <span style={{ color: "var(--sc-sakura)" }}>Yamaterous</span>. All rights reserved.
+        {env.VITE_CONTACT_FORM_URL && (
+          <>
+            {" "}|{" "}
+            <a
+              href={env.VITE_CONTACT_FORM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--sc-cyber)", textDecoration: "none" }}
+            >
+              お問い合わせ
+            </a>
+          </>
+        )}
       </p>
     </footer>
   );

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { client, orpc } from "@/utils/orpc";
 
@@ -8,7 +9,11 @@ export const Route = createFileRoute("/works/")({
 });
 
 function WorksPage() {
-  const { data: works = [], isLoading } = useQuery(orpc.works.list.queryOptions());
+  const [selectedTagId, setSelectedTagId] = useState<string | undefined>(undefined);
+  const { data: works = [], isLoading } = useQuery(
+    orpc.works.list.queryOptions({ input: { tagId: selectedTagId } }),
+  );
+  const { data: tags = [] } = useQuery(orpc.tags.list.queryOptions());
   const navigate = useNavigate();
   const { mutate: trackClick } = useMutation({
     mutationFn: ({ id, title }: { id: string; title: string }) =>
@@ -54,6 +59,58 @@ function WorksPage() {
           自作サイト・Webアプリの一覧
         </p>
       </div>
+
+      {/* タグフィルター */}
+      {tags.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.5rem",
+            marginBottom: "2rem",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedTagId(undefined)}
+            style={{
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "11px",
+              letterSpacing: "0.08em",
+              padding: "0.3rem 0.8rem",
+              borderRadius: "2px",
+              border: `1px solid ${selectedTagId === undefined ? "var(--sc-sakura)" : "rgba(200,0,90,0.2)"}`,
+              background: selectedTagId === undefined ? "var(--sc-sakura)" : "transparent",
+              color: selectedTagId === undefined ? "#fff" : "var(--sc-muted)",
+              cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+          >
+            すべて
+          </button>
+          {tags.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setSelectedTagId(t.id === selectedTagId ? undefined : t.id)}
+              style={{
+                fontFamily: "var(--sc-font-mono)",
+                fontSize: "11px",
+                letterSpacing: "0.08em",
+                padding: "0.3rem 0.8rem",
+                borderRadius: "2px",
+                border: `1px solid ${selectedTagId === t.id ? "var(--sc-cyber)" : "rgba(200,0,90,0.2)"}`,
+                background: selectedTagId === t.id ? "var(--sc-cyber)" : "transparent",
+                color: selectedTagId === t.id ? "#fff" : "var(--sc-muted)",
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* 作品グリッド */}
       {isLoading ? (
