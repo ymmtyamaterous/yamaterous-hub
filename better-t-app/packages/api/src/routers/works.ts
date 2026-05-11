@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, asc, eq, max } from "drizzle-orm";
+import { and, asc, eq, inArray, max } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@better-t-app/db";
@@ -44,7 +44,9 @@ async function getWorkWithTags(id: string) {
 
   if (rows.length === 0) return null;
 
-  const workRow = rows[0].work;
+  const firstRow = rows[0];
+  if (!firstRow) return null;
+  const workRow = firstRow.work;
   const tags = rows
     .filter((r) => r.tag !== null)
     .map((r) => ({ id: r.tag!.id, name: r.tag!.name }));
@@ -52,13 +54,24 @@ async function getWorkWithTags(id: string) {
   return toWorkOutput(workRow, tags);
 }
 
-async function listWorksWithTags(publishedOnly: boolean) {
+async function listWorksWithTags(publishedOnly: boolean, tagId?: string) {
+  const conditions = [];
+  if (publishedOnly) conditions.push(eq(work.isPublished, true));
+  if (tagId) {
+    conditions.push(
+      inArray(
+        work.id,
+        db.select({ id: workTag.workId }).from(workTag).where(eq(workTag.tagId, tagId)),
+      ),
+    );
+  }
+
   const rows = await db
     .select({ work: work, tag: tag })
     .from(work)
     .leftJoin(workTag, eq(workTag.workId, work.id))
     .leftJoin(tag, eq(tag.id, workTag.tagId))
-    .where(publishedOnly ? eq(work.isPublished, true) : undefined)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
     .orderBy(asc(work.sortOrder), asc(work.createdAt));
 
   // Group by work id
@@ -131,12 +144,14 @@ const WorkUpdateInput = z.object({
 
 export const worksRouter = {
   list: publicProcedure
+    .input(z.object({ tagId: z.string().optional() }).optional())
     .output(z.array(WorkOutput))
-    .handler(async () => listWorksWithTags(true)),
+    .handler(async ({ input }) => listWorksWithTags(true, input?.tagId)),
 
   adminList: protectedProcedure
+    .input(z.object({ tagId: z.string().optional() }).optional())
     .output(z.array(WorkOutput))
-    .handler(async () => listWorksWithTags(false)),
+    .handler(async ({ input }) => listWorksWithTags(false, input?.tagId)),
 
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -253,6 +268,27 @@ export const worksRouter = {
         throw new ORPCError("NOT_FOUND", { message: "Work not found" });
       }
       await db.delete(work).where(eq(work.id, input.id));
+      return { success: true as const };
+    }),
+
+  reorder: protectedProcedure
+    .input(
+      z.object({
+        updates: z
+          .array(z.object({ id: z.string(), sortOrder: z.number().int() }))
+          .min(1),
+      }),
+    )
+    .output(z.object({ success: z.literal(true) }))
+    .handler(async ({ input }) => {
+      await Promise.all(
+        input.updates.map(({ id, sortOrder }) =>
+          db
+            .update(work)
+            .set({ sortOrder, updatedAt: new Date() })
+            .where(eq(work.id, id)),
+        ),
+      );
       return { success: true as const };
     }),
 };
