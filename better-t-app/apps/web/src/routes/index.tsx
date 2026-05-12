@@ -3,6 +3,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
 import { AutumnCyberHome } from "@/components/autumn-cyber-home";
+import { LatestNewsSection } from "@/components/latest-news";
 import { SeaCyberHome } from "@/components/sea-cyber-home";
 import { WinterCyberHome } from "@/components/winter-cyber-home";
 import { orpc } from "@/utils/orpc";
@@ -439,6 +440,9 @@ function SakuraCyberHome() {
           </div>
         </section>
       )}
+
+      {/* 最新ニュースセクション */}
+      <LatestNewsSection />
     </div>
   );
 }

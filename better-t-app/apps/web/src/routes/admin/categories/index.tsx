@@ -192,7 +192,7 @@ function AdminCategoriesPage() {
                 setNewSlug(e.target.value);
               }}
               placeholder="tech"
-              pattern="[a-z0-9-]+"
+              pattern="[a-z0-9\-]+"
               title="小文字英数字とハイフンのみ"
               required
               className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
@@ -318,7 +318,7 @@ function AdminCategoriesPage() {
                           onChange={(e) =>
                             setEditValues((v) => ({ ...v, slug: e.target.value }))
                           }
-                          pattern="[a-z0-9-]+"
+                          pattern="[a-z0-9\-]+"
                           title="小文字英数字とハイフンのみ"
                           className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
                         />
