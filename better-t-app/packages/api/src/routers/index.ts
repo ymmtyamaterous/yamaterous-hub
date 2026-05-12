@@ -3,6 +3,7 @@ import type { RouterClient } from "@orpc/server";
 import { protectedProcedure, publicProcedure } from "../index";
 import { analyticsRouter } from "./analytics";
 import { categoriesRouter } from "./categories";
+import { newsRouter } from "./news";
 import { podcastsRouter } from "./podcasts";
 import { postsRouter } from "./posts";
 import { profileRouter } from "./profile";
@@ -25,6 +26,7 @@ export const appRouter = {
   posts: postsRouter,
   categories: categoriesRouter,
   podcasts: podcastsRouter,
+  news: newsRouter,
   analytics: analyticsRouter,
 };
 export type AppRouter = typeof appRouter;

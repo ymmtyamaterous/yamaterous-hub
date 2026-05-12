@@ -256,6 +256,39 @@ export const podcastCategoryRelations = relations(podcastCategory, ({ one }) => 
   }),
 }));
 
+// ── News ──────────────────────────────────────────────────────────────────────
+
+export const news = sqliteTable(
+  "news",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull().unique(),
+    content: text("content").notNull().default(""),
+    excerpt: text("excerpt").notNull().default(""),
+    newsType: text("news_type", { enum: ["site_update", "personal"] })
+      .notNull()
+      .default("personal"),
+    isPublished: integer("is_published", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    publishedAt: integer("published_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("news_slug_idx").on(table.slug),
+    index("news_is_published_idx").on(table.isPublished),
+    index("news_published_at_idx").on(table.publishedAt),
+    index("news_type_idx").on(table.newsType),
+  ],
+);
+
 // ── Analytics ─────────────────────────────────────────────────────────────────
 
 export const pageView = sqliteTable(

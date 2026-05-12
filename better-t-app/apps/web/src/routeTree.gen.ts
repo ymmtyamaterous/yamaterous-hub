@@ -16,19 +16,24 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorksIndexRouteImport } from './routes/works/index'
 import { Route as PodcastIndexRouteImport } from './routes/podcast/index'
+import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as WorksWorkIdRouteImport } from './routes/works/$workId'
+import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AdminSiteRouteImport } from './routes/admin/site'
 import { Route as AdminProfileRouteImport } from './routes/admin/profile'
 import { Route as AdminWorksIndexRouteImport } from './routes/admin/works/index'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin/posts/index'
 import { Route as AdminPodcastsIndexRouteImport } from './routes/admin/podcasts/index'
+import { Route as AdminNewsIndexRouteImport } from './routes/admin/news/index'
 import { Route as AdminCategoriesIndexRouteImport } from './routes/admin/categories/index'
 import { Route as AdminWorksNewRouteImport } from './routes/admin/works/new'
 import { Route as AdminPostsNewRouteImport } from './routes/admin/posts/new'
 import { Route as AdminPodcastsNewRouteImport } from './routes/admin/podcasts/new'
+import { Route as AdminNewsNewRouteImport } from './routes/admin/news/new'
+import { Route as AdminNewsNewsIdIndexRouteImport } from './routes/admin/news/$newsId/index'
 import { Route as AdminWorksWorkIdEditRouteImport } from './routes/admin/works/$workId/edit'
 import { Route as AdminPostsPostIdEditRouteImport } from './routes/admin/posts/$postId/edit'
 import { Route as AdminPodcastsEpisodeIdEditRouteImport } from './routes/admin/podcasts/$episodeId/edit'
@@ -68,6 +73,11 @@ const PodcastIndexRoute = PodcastIndexRouteImport.update({
   path: '/podcast/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewsIndexRoute = NewsIndexRouteImport.update({
+  id: '/news/',
+  path: '/news/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -81,6 +91,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const WorksWorkIdRoute = WorksWorkIdRouteImport.update({
   id: '/works/$workId',
   path: '/works/$workId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/news/$slug',
+  path: '/news/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -113,6 +128,11 @@ const AdminPodcastsIndexRoute = AdminPodcastsIndexRouteImport.update({
   path: '/podcasts/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNewsIndexRoute = AdminNewsIndexRouteImport.update({
+  id: '/news/',
+  path: '/news/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesIndexRoute = AdminCategoriesIndexRouteImport.update({
   id: '/categories/',
   path: '/categories/',
@@ -131,6 +151,16 @@ const AdminPostsNewRoute = AdminPostsNewRouteImport.update({
 const AdminPodcastsNewRoute = AdminPodcastsNewRouteImport.update({
   id: '/podcasts/new',
   path: '/podcasts/new',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNewsNewRoute = AdminNewsNewRouteImport.update({
+  id: '/news/new',
+  path: '/news/new',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNewsNewsIdIndexRoute = AdminNewsNewsIdIndexRouteImport.update({
+  id: '/news/$newsId/',
+  path: '/news/$newsId/',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminWorksWorkIdEditRoute = AdminWorksWorkIdEditRouteImport.update({
@@ -159,21 +189,26 @@ export interface FileRoutesByFullPath {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/podcast/': typeof PodcastIndexRoute
   '/works/': typeof WorksIndexRoute
+  '/admin/news/new': typeof AdminNewsNewRoute
   '/admin/podcasts/new': typeof AdminPodcastsNewRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
   '/admin/categories/': typeof AdminCategoriesIndexRoute
+  '/admin/news/': typeof AdminNewsIndexRoute
   '/admin/podcasts/': typeof AdminPodcastsIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/works/': typeof AdminWorksIndexRoute
   '/admin/podcasts/$episodeId/edit': typeof AdminPodcastsEpisodeIdEditRoute
   '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
   '/admin/works/$workId/edit': typeof AdminWorksWorkIdEditRoute
+  '/admin/news/$newsId/': typeof AdminNewsNewsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -183,21 +218,26 @@ export interface FileRoutesByTo {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/news': typeof NewsIndexRoute
   '/podcast': typeof PodcastIndexRoute
   '/works': typeof WorksIndexRoute
+  '/admin/news/new': typeof AdminNewsNewRoute
   '/admin/podcasts/new': typeof AdminPodcastsNewRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
   '/admin/categories': typeof AdminCategoriesIndexRoute
+  '/admin/news': typeof AdminNewsIndexRoute
   '/admin/podcasts': typeof AdminPodcastsIndexRoute
   '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/works': typeof AdminWorksIndexRoute
   '/admin/podcasts/$episodeId/edit': typeof AdminPodcastsEpisodeIdEditRoute
   '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
   '/admin/works/$workId/edit': typeof AdminWorksWorkIdEditRoute
+  '/admin/news/$newsId': typeof AdminNewsNewsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -209,21 +249,26 @@ export interface FileRoutesById {
   '/admin/profile': typeof AdminProfileRoute
   '/admin/site': typeof AdminSiteRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/works/$workId': typeof WorksWorkIdRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/podcast/': typeof PodcastIndexRoute
   '/works/': typeof WorksIndexRoute
+  '/admin/news/new': typeof AdminNewsNewRoute
   '/admin/podcasts/new': typeof AdminPodcastsNewRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
   '/admin/works/new': typeof AdminWorksNewRoute
   '/admin/categories/': typeof AdminCategoriesIndexRoute
+  '/admin/news/': typeof AdminNewsIndexRoute
   '/admin/podcasts/': typeof AdminPodcastsIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/works/': typeof AdminWorksIndexRoute
   '/admin/podcasts/$episodeId/edit': typeof AdminPodcastsEpisodeIdEditRoute
   '/admin/posts/$postId/edit': typeof AdminPostsPostIdEditRoute
   '/admin/works/$workId/edit': typeof AdminWorksWorkIdEditRoute
+  '/admin/news/$newsId/': typeof AdminNewsNewsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -236,21 +281,26 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/site'
     | '/blog/$slug'
+    | '/news/$slug'
     | '/works/$workId'
     | '/admin/'
     | '/blog/'
+    | '/news/'
     | '/podcast/'
     | '/works/'
+    | '/admin/news/new'
     | '/admin/podcasts/new'
     | '/admin/posts/new'
     | '/admin/works/new'
     | '/admin/categories/'
+    | '/admin/news/'
     | '/admin/podcasts/'
     | '/admin/posts/'
     | '/admin/works/'
     | '/admin/podcasts/$episodeId/edit'
     | '/admin/posts/$postId/edit'
     | '/admin/works/$workId/edit'
+    | '/admin/news/$newsId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -260,21 +310,26 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/site'
     | '/blog/$slug'
+    | '/news/$slug'
     | '/works/$workId'
     | '/admin'
     | '/blog'
+    | '/news'
     | '/podcast'
     | '/works'
+    | '/admin/news/new'
     | '/admin/podcasts/new'
     | '/admin/posts/new'
     | '/admin/works/new'
     | '/admin/categories'
+    | '/admin/news'
     | '/admin/podcasts'
     | '/admin/posts'
     | '/admin/works'
     | '/admin/podcasts/$episodeId/edit'
     | '/admin/posts/$postId/edit'
     | '/admin/works/$workId/edit'
+    | '/admin/news/$newsId'
   id:
     | '__root__'
     | '/'
@@ -285,21 +340,26 @@ export interface FileRouteTypes {
     | '/admin/profile'
     | '/admin/site'
     | '/blog/$slug'
+    | '/news/$slug'
     | '/works/$workId'
     | '/admin/'
     | '/blog/'
+    | '/news/'
     | '/podcast/'
     | '/works/'
+    | '/admin/news/new'
     | '/admin/podcasts/new'
     | '/admin/posts/new'
     | '/admin/works/new'
     | '/admin/categories/'
+    | '/admin/news/'
     | '/admin/podcasts/'
     | '/admin/posts/'
     | '/admin/works/'
     | '/admin/podcasts/$episodeId/edit'
     | '/admin/posts/$postId/edit'
     | '/admin/works/$workId/edit'
+    | '/admin/news/$newsId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -309,8 +369,10 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ProfileRoute: typeof ProfileRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  NewsSlugRoute: typeof NewsSlugRoute
   WorksWorkIdRoute: typeof WorksWorkIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  NewsIndexRoute: typeof NewsIndexRoute
   PodcastIndexRoute: typeof PodcastIndexRoute
   WorksIndexRoute: typeof WorksIndexRoute
 }
@@ -366,6 +428,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PodcastIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/news/': {
+      id: '/news/'
+      path: '/news'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -385,6 +454,13 @@ declare module '@tanstack/react-router' {
       path: '/works/$workId'
       fullPath: '/works/$workId'
       preLoaderRoute: typeof WorksWorkIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/news/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -429,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPodcastsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/news/': {
+      id: '/admin/news/'
+      path: '/news'
+      fullPath: '/admin/news/'
+      preLoaderRoute: typeof AdminNewsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories/': {
       id: '/admin/categories/'
       path: '/categories'
@@ -455,6 +538,20 @@ declare module '@tanstack/react-router' {
       path: '/podcasts/new'
       fullPath: '/admin/podcasts/new'
       preLoaderRoute: typeof AdminPodcastsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/news/new': {
+      id: '/admin/news/new'
+      path: '/news/new'
+      fullPath: '/admin/news/new'
+      preLoaderRoute: typeof AdminNewsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/news/$newsId/': {
+      id: '/admin/news/$newsId/'
+      path: '/news/$newsId'
+      fullPath: '/admin/news/$newsId/'
+      preLoaderRoute: typeof AdminNewsNewsIdIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/works/$workId/edit': {
@@ -485,32 +582,38 @@ interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
   AdminSiteRoute: typeof AdminSiteRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminNewsNewRoute: typeof AdminNewsNewRoute
   AdminPodcastsNewRoute: typeof AdminPodcastsNewRoute
   AdminPostsNewRoute: typeof AdminPostsNewRoute
   AdminWorksNewRoute: typeof AdminWorksNewRoute
   AdminCategoriesIndexRoute: typeof AdminCategoriesIndexRoute
+  AdminNewsIndexRoute: typeof AdminNewsIndexRoute
   AdminPodcastsIndexRoute: typeof AdminPodcastsIndexRoute
   AdminPostsIndexRoute: typeof AdminPostsIndexRoute
   AdminWorksIndexRoute: typeof AdminWorksIndexRoute
   AdminPodcastsEpisodeIdEditRoute: typeof AdminPodcastsEpisodeIdEditRoute
   AdminPostsPostIdEditRoute: typeof AdminPostsPostIdEditRoute
   AdminWorksWorkIdEditRoute: typeof AdminWorksWorkIdEditRoute
+  AdminNewsNewsIdIndexRoute: typeof AdminNewsNewsIdIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
   AdminSiteRoute: AdminSiteRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminNewsNewRoute: AdminNewsNewRoute,
   AdminPodcastsNewRoute: AdminPodcastsNewRoute,
   AdminPostsNewRoute: AdminPostsNewRoute,
   AdminWorksNewRoute: AdminWorksNewRoute,
   AdminCategoriesIndexRoute: AdminCategoriesIndexRoute,
+  AdminNewsIndexRoute: AdminNewsIndexRoute,
   AdminPodcastsIndexRoute: AdminPodcastsIndexRoute,
   AdminPostsIndexRoute: AdminPostsIndexRoute,
   AdminWorksIndexRoute: AdminWorksIndexRoute,
   AdminPodcastsEpisodeIdEditRoute: AdminPodcastsEpisodeIdEditRoute,
   AdminPostsPostIdEditRoute: AdminPostsPostIdEditRoute,
   AdminWorksWorkIdEditRoute: AdminWorksWorkIdEditRoute,
+  AdminNewsNewsIdIndexRoute: AdminNewsNewsIdIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -522,8 +625,10 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ProfileRoute: ProfileRoute,
   BlogSlugRoute: BlogSlugRoute,
+  NewsSlugRoute: NewsSlugRoute,
   WorksWorkIdRoute: WorksWorkIdRoute,
   BlogIndexRoute: BlogIndexRoute,
+  NewsIndexRoute: NewsIndexRoute,
   PodcastIndexRoute: PodcastIndexRoute,
   WorksIndexRoute: WorksIndexRoute,
 }
