@@ -81,10 +81,18 @@ export function MarkdownRenderer({
           color: var(--sc-muted);
           font-style: italic;
         }
-        .md-body ul, .md-body ol {
+        .md-body ul {
           margin: 1rem 0;
           padding-left: 1.8rem;
+          list-style-type: disc;
         }
+        .md-body ol {
+          margin: 1rem 0;
+          padding-left: 1.8rem;
+          list-style-type: decimal;
+        }
+        .md-body ul ul { list-style-type: circle; }
+        .md-body ul ul ul { list-style-type: square; }
         .md-body li { margin: 0.3rem 0; }
         .md-body table {
           width: 100%;
