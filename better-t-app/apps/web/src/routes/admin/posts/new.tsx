@@ -152,7 +152,7 @@ function NewPostPage() {
                 setSlug(e.target.value);
               }}
               placeholder="my-post-slug"
-              pattern="[a-z0-9-]+"
+              pattern="[a-z0-9\-]+"
               title="小文字英数字とハイフンのみ"
               required
               className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"

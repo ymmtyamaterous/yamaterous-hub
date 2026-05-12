@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
+import { LatestNewsSection } from "@/components/latest-news";
 import { orpc } from "@/utils/orpc";
 
 export function SeaCyberHome() {
@@ -323,6 +324,9 @@ export function SeaCyberHome() {
           </div>
         </section>
       )}
+
+      {/* 最新ニュースセクション */}
+      <LatestNewsSection />
     </div>
   );
 }

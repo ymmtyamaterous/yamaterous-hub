@@ -45,6 +45,7 @@ beforeEach(async () => {
   await testDb.delete(schema.postCategory);
   await testDb.delete(schema.post);
   await testDb.delete(schema.category);
+  await testDb.delete(schema.news);
 });
 
 describe("profileRouter", () => {
@@ -384,3 +385,142 @@ describe("podcastsRouter", () => {
   });
 });
 
+const { newsRouter } = await import("@better-t-app/api/routers/news");
+
+describe("newsRouter", () => {
+  test("list: 公開ニュースのみ返す", async () => {
+    await testDb.insert(schema.news).values([
+      { id: "n1", title: "公開ニュース", slug: "pub-news", isPublished: true },
+      { id: "n2", title: "非公開ニュース", slug: "draft-news", isPublished: false },
+    ]);
+    const result = await call(newsRouter.list, undefined, publicCtx);
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("公開ニュース");
+  });
+
+  test("adminList: すべてのニュースを返す", async () => {
+    await testDb.insert(schema.news).values([
+      { id: "n1", title: "公開ニュース", slug: "pub-news", isPublished: true },
+      { id: "n2", title: "非公開ニュース", slug: "draft-news", isPublished: false },
+    ]);
+    const result = await call(newsRouter.adminList, undefined, authCtx);
+    expect(result).toHaveLength(2);
+  });
+
+  test("list: newsType フィルターが機能する", async () => {
+    await testDb.insert(schema.news).values([
+      { id: "n1", title: "サイト更新", slug: "site-upd", newsType: "site_update", isPublished: true },
+      { id: "n2", title: "個人ニュース", slug: "personal-news", newsType: "personal", isPublished: true },
+    ]);
+    const result = await call(newsRouter.list, { newsType: "site_update" }, publicCtx);
+    expect(result).toHaveLength(1);
+    expect(result[0].newsType).toBe("site_update");
+  });
+
+  test("list: キーワードフィルターが機能する", async () => {
+    await testDb.insert(schema.news).values([
+      { id: "n1", title: "リリースノート", slug: "release-note", isPublished: true },
+      { id: "n2", title: "日記", slug: "diary", isPublished: true },
+    ]);
+    const result = await call(newsRouter.list, { keyword: "リリース" }, publicCtx);
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("リリースノート");
+  });
+
+  test("create: ニュースを作成できる", async () => {
+    const result = await call(
+      newsRouter.create,
+      { title: "新しいニュース", slug: "new-news", content: "内容", newsType: "personal", isPublished: false },
+      authCtx,
+    );
+    expect(result.title).toBe("新しいニュース");
+    expect(result.newsType).toBe("personal");
+    expect(result.isPublished).toBe(false);
+  });
+
+  test("create: デフォルト newsType は personal", async () => {
+    const result = await call(
+      newsRouter.create,
+      { title: "デフォルト種別", slug: "default-type", content: "" },
+      authCtx,
+    );
+    expect(result.newsType).toBe("personal");
+  });
+
+  test("create: スラッグ重複時に CONFLICT を投げる", async () => {
+    await testDb.insert(schema.news).values({ id: "dup", title: "既存", slug: "dup-slug", isPublished: false });
+    await expect(
+      call(newsRouter.create, { title: "重複", slug: "dup-slug", content: "" }, authCtx),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+  });
+
+  test("create: 未認証時に UNAUTHORIZED を投げる", async () => {
+    await expect(
+      call(newsRouter.create, { title: "無認証", slug: "no-auth", content: "" }, publicCtx),
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+
+  test("create: isPublished=true で publishedAt が設定される", async () => {
+    const result = await call(
+      newsRouter.create,
+      { title: "公開ニュース", slug: "pub-now", content: "", isPublished: true },
+      authCtx,
+    );
+    expect(result.isPublished).toBe(true);
+    expect(result.publishedAt).not.toBeNull();
+  });
+
+  test("update: ニュースを更新できる", async () => {
+    await testDb.insert(schema.news).values({ id: "upd-n", title: "元タイトル", slug: "orig", isPublished: false });
+    const result = await call(newsRouter.update, { id: "upd-n", title: "新タイトル", isPublished: true }, authCtx);
+    expect(result.title).toBe("新タイトル");
+    expect(result.isPublished).toBe(true);
+  });
+
+  test("update: スラッグ重複時に CONFLICT を投げる", async () => {
+    await testDb.insert(schema.news).values([
+      { id: "n-a", title: "A", slug: "slug-a", isPublished: false },
+      { id: "n-b", title: "B", slug: "slug-b", isPublished: false },
+    ]);
+    await expect(
+      call(newsRouter.update, { id: "n-a", slug: "slug-b" }, authCtx),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+  });
+
+  test("update: 存在しない ID で NOT_FOUND を投げる", async () => {
+    await expect(
+      call(newsRouter.update, { id: "not-exist", title: "更新" }, authCtx),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  test("delete: ニュースを削除できる", async () => {
+    await testDb.insert(schema.news).values({ id: "del-n", title: "削除対象", slug: "del-news", isPublished: false });
+    const result = await call(newsRouter.delete, { id: "del-n" }, authCtx);
+    expect(result.success).toBe(true);
+  });
+
+  test("delete: 存在しない ID で NOT_FOUND を投げる", async () => {
+    await expect(
+      call(newsRouter.delete, { id: "not-exist" }, authCtx),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  test("getBySlug: 公開ニュースをスラッグで取得できる", async () => {
+    await testDb.insert(schema.news).values({ id: "slug-n", title: "スラッグ検索", slug: "find-news", isPublished: true });
+    const result = await call(newsRouter.getBySlug, { slug: "find-news" }, publicCtx);
+    expect(result.title).toBe("スラッグ検索");
+  });
+
+  test("getBySlug: 非公開ニュースは NOT_FOUND を投げる", async () => {
+    await testDb.insert(schema.news).values({ id: "priv-n", title: "非公開", slug: "hidden-news", isPublished: false });
+    await expect(
+      call(newsRouter.getBySlug, { slug: "hidden-news" }, publicCtx),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  test("adminGet: 管理者は非公開ニュースを取得できる", async () => {
+    await testDb.insert(schema.news).values({ id: "admin-n", title: "非公開", slug: "admin-only", isPublished: false });
+    const result = await call(newsRouter.adminGet, { id: "admin-n" }, authCtx);
+    expect(result.title).toBe("非公開");
+  });
+});
