@@ -299,6 +299,9 @@
   border-color: rgba(0, 102, 138, 0.12) !important;
   box-shadow: 0 2px 8px rgba(0, 191, 255, 0.06) !important;
 }
+[data-site-theme="sea-cyber"] .sc-post-header {
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
 [data-site-theme="sea-cyber"] .sc-page-card:hover {
   border-color: rgba(0, 191, 255, 0.4) !important;
   box-shadow: 0 4px 20px rgba(0, 191, 255, 0.15) !important;

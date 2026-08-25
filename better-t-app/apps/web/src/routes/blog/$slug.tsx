@@ -112,7 +112,7 @@ function BlogPostPage() {
       </div>
 
       {/* 記事ヘッダー */}
-      <header style={{ marginBottom: "2.5rem" }}>
+      <header className="sc-post-header" style={{ marginBottom: "2.5rem" }}>
         <h1
           style={{
             fontFamily: "var(--sc-font-jp)",
