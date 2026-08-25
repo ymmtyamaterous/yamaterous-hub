@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/works/$workId")({
@@ -11,6 +12,9 @@ function WorkDetailPage() {
   const { workId } = Route.useParams();
   const { data: work, isLoading, isError } = useQuery(
     orpc.works.getById.queryOptions({ input: { id: workId } }),
+  );
+  const { data: releaseNotes = [] } = useQuery(
+    orpc.releaseNotes.list.queryOptions({ input: { workId } }),
   );
 
   if (isLoading) {
@@ -167,6 +171,71 @@ function WorkDetailPage() {
       >
         {work.description}
       </div>
+
+      {/* リリースノート */}
+      {releaseNotes.length > 0 && (
+        <section
+          style={{
+            marginBottom: "2.5rem",
+            borderTop: "1px solid rgba(200,0,90,0.1)",
+            paddingTop: "1.5rem",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--sc-font-mono)",
+              fontSize: "11px",
+              letterSpacing: "0.12em",
+              color: "var(--sc-cyber)",
+              marginBottom: "0.45rem",
+            }}
+          >
+            // RELEASE NOTES
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--sc-font-jp)",
+              fontWeight: 900,
+              fontSize: "1.45rem",
+              color: "var(--sc-text)",
+              marginBottom: "1.25rem",
+            }}
+            className="dark:!text-neutral-100"
+          >
+            リリースノート
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {releaseNotes.map((note) => (
+              <article
+                key={note.id}
+                style={{
+                  padding: "1.2rem",
+                  border: "1px solid rgba(200,0,90,0.12)",
+                  borderRadius: "4px",
+                  background: "rgba(200,0,90,0.025)",
+                }}
+              >
+                <div style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", flexWrap: "wrap" }}>
+                  <span style={{ fontFamily: "var(--sc-font-mono)", fontWeight: 700, fontSize: "14px", color: "var(--sc-sakura)" }}>
+                    v{note.version}
+                  </span>
+                  {note.title && (
+                    <h3 style={{ fontFamily: "var(--sc-font-jp)", fontWeight: 700, fontSize: "16px", color: "var(--sc-text)", margin: 0 }} className="dark:!text-neutral-200">
+                      {note.title}
+                    </h3>
+                  )}
+                  <time style={{ fontFamily: "var(--sc-font-mono)", fontSize: "10px", color: "var(--sc-muted)", marginLeft: "auto" }}>
+                    {new Date(note.publishedAt ?? note.createdAt).toLocaleDateString("ja-JP")}
+                  </time>
+                </div>
+                <div style={{ marginTop: "0.6rem" }}>
+                  <MarkdownRenderer content={note.content} />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* リンクボタン */}
       <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>

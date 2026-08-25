@@ -5,6 +5,7 @@ import {
   primaryKey,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 // ── Profile ──────────────────────────────────────────────────────────────────
@@ -63,6 +64,38 @@ export const work = sqliteTable(
   (table) => [
     index("work_is_published_idx").on(table.isPublished),
     index("work_sort_order_idx").on(table.sortOrder),
+  ],
+);
+
+// ── WorkReleaseNote ──────────────────────────────────────────────────────────
+
+export const workReleaseNote = sqliteTable(
+  "work_release_note",
+  {
+    id: text("id").primaryKey(),
+    workId: text("work_id")
+      .notNull()
+      .references(() => work.id, { onDelete: "cascade" }),
+    version: text("version").notNull(),
+    title: text("title").notNull().default(""),
+    content: text("content").notNull().default(""),
+    isPublished: integer("is_published", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    publishedAt: integer("published_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("work_release_note_work_id_idx").on(table.workId),
+    index("work_release_note_published_idx").on(table.workId, table.isPublished),
+    index("work_release_note_published_at_idx").on(table.publishedAt),
+    uniqueIndex("work_release_note_work_version_idx").on(table.workId, table.version),
   ],
 );
 
@@ -125,6 +158,14 @@ export const post = sqliteTable(
 
 export const workRelations = relations(work, ({ many }) => ({
   workTags: many(workTag),
+  releaseNotes: many(workReleaseNote),
+}));
+
+export const workReleaseNoteRelations = relations(workReleaseNote, ({ one }) => ({
+  work: one(work, {
+    fields: [workReleaseNote.workId],
+    references: [work.id],
+  }),
 }));
 
 export const tagRelations = relations(tag, ({ many }) => ({

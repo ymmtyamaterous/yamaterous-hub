@@ -26,6 +26,7 @@ mock.module("@better-t-app/auth", () => ({ auth: { api: { getSession: async () =
 const { call } = await import("@orpc/server");
 const { profileRouter } = await import("@better-t-app/api/routers/profile");
 const { worksRouter } = await import("@better-t-app/api/routers/works");
+const { releaseNotesRouter } = await import("@better-t-app/api/routers/release-notes");
 const { tagsRouter } = await import("@better-t-app/api/routers/tags");
 const { analyticsRouter } = await import("@better-t-app/api/routers/analytics");
 const { podcastsRouter } = await import("@better-t-app/api/routers/podcasts");
@@ -35,6 +36,7 @@ const authCtx = { context: { session: { user: { id: "user-1", name: "Test" } } }
 const publicCtx = { context: {} };
 
 beforeEach(async () => {
+  await testDb.delete(schema.workReleaseNote);
   await testDb.delete(schema.workTag);
   await testDb.delete(schema.work);
   await testDb.delete(schema.tag);
@@ -228,6 +230,52 @@ describe("worksRouter", () => {
   test("getById: 非公開作品は NOT_FOUND を返す", async () => {
     await testDb.insert(schema.work).values({ id: "private-w", title: "非公開", description: "説明", isPublished: false, sortOrder: 0 });
     await expect(call(worksRouter.getById, { id: "private-w" }, publicCtx)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
+describe("releaseNotesRouter", () => {
+  beforeEach(async () => {
+    await testDb.insert(schema.work).values({
+      id: "release-work",
+      title: "リリースノート対象",
+      description: "説明",
+      isPublished: true,
+      sortOrder: 0,
+    });
+  });
+
+  test("create: バージョン付きリリースノートを作成できる", async () => {
+    const result = await call(
+      releaseNotesRouter.create,
+      { workId: "release-work", version: "1.0.0", title: "初回リリース", content: "新機能を追加しました" },
+      authCtx,
+    );
+
+    expect(result.version).toBe("1.0.0");
+    expect(result.title).toBe("初回リリース");
+  });
+
+  test("list: 公開済みをバージョンの新しい順に返す", async () => {
+    await call(releaseNotesRouter.create, { workId: "release-work", version: "1.0.0", content: "初回", isPublished: true }, authCtx);
+    await call(releaseNotesRouter.create, { workId: "release-work", version: "1.10.0", content: "更新", isPublished: true }, authCtx);
+    await call(releaseNotesRouter.create, { workId: "release-work", version: "2.0.0", content: "下書き", isPublished: false }, authCtx);
+
+    const result = await call(releaseNotesRouter.list, { workId: "release-work" }, publicCtx);
+    expect(result.map((note) => note.version)).toEqual(["1.10.0", "1.0.0"]);
+  });
+
+  test("create: 同一作品でバージョンが重複すると CONFLICT を返す", async () => {
+    await call(releaseNotesRouter.create, { workId: "release-work", version: "1.0.0", content: "初回" }, authCtx);
+
+    await expect(
+      call(releaseNotesRouter.create, { workId: "release-work", version: "1.0.0", content: "重複" }, authCtx),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+  });
+
+  test("create: 不正なバージョンを拒否する", async () => {
+    await expect(
+      call(releaseNotesRouter.create, { workId: "release-work", version: "v1", content: "不正" }, authCtx),
+    ).rejects.toBeDefined();
   });
 });
 

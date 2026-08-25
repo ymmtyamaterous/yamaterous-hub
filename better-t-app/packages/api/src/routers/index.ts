@@ -7,6 +7,7 @@ import { newsRouter } from "./news";
 import { podcastsRouter } from "./podcasts";
 import { postsRouter } from "./posts";
 import { profileRouter } from "./profile";
+import { releaseNotesRouter } from "./release-notes";
 import { tagsRouter } from "./tags";
 import { worksRouter } from "./works";
 
@@ -22,6 +23,7 @@ export const appRouter = {
   }),
   profile: profileRouter,
   works: worksRouter,
+  releaseNotes: releaseNotesRouter,
   tags: tagsRouter,
   posts: postsRouter,
   categories: categoriesRouter,

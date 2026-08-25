@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
+import { ReleaseNoteManager } from "@/components/release-note-manager";
 import { WorkForm, type WorkFormValues } from "@/components/work-form";
 import { orpc } from "@/utils/orpc";
 
@@ -95,6 +96,7 @@ function EditWorkPage() {
         submitLabel="更新する"
         isSubmitting={updateMutation.isPending}
       />
+      <ReleaseNoteManager workId={workId} />
     </div>
   );
 }
