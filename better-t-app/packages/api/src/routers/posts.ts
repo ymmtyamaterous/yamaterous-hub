@@ -45,7 +45,9 @@ async function getPostWithCategories(id: string) {
 
   if (rows.length === 0) return null;
 
-  const postRow = rows[0].post;
+  const [firstRow] = rows;
+  if (!firstRow) return null;
+  const postRow = firstRow.post;
   const categories = rows
     .filter((r) => r.category !== null)
     .map((r) => ({
@@ -223,7 +225,9 @@ export const postsRouter = {
         throw new ORPCError("NOT_FOUND", { message: "Post not found" });
       }
 
-      const postRow = rows[0].post;
+      const [firstRow] = rows;
+      if (!firstRow) throw new ORPCError("NOT_FOUND");
+      const postRow = firstRow.post;
       const categories = rows
         .filter((r) => r.category !== null)
         .map((r) => ({
@@ -303,8 +307,10 @@ export const postsRouter = {
       if (existing.length === 0) {
         throw new ORPCError("NOT_FOUND", { message: "Post not found" });
       }
+      const [existingPost] = existing;
+      if (!existingPost) throw new ORPCError("NOT_FOUND");
 
-      if (input.slug && input.slug !== existing[0].slug) {
+      if (input.slug && input.slug !== existingPost.slug) {
         const slugConflict = await db
           .select({ id: post.id })
           .from(post)
@@ -317,12 +323,12 @@ export const postsRouter = {
         }
       }
 
-      const wasPublished = existing[0].isPublished;
+      const wasPublished = existingPost.isPublished;
       const willPublish = input.isPublished ?? wasPublished;
       const publishedAt =
         !wasPublished && willPublish
           ? new Date()
-          : (existing[0].publishedAt ?? null);
+          : (existingPost.publishedAt ?? null);
 
       await db
         .update(post)

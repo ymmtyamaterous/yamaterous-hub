@@ -356,7 +356,7 @@ export const clickEvent = sqliteTable(
   "click_event",
   {
     id: text("id").primaryKey(),
-    eventType: text("event_type").notNull(), // 'work_click' | 'post_click'
+    eventType: text("event_type").notNull(), // 'work_click' | 'post_click' | 'news_click'
     targetId: text("target_id").notNull(),
     targetTitle: text("target_title").notNull(),
     isAdmin: integer("is_admin", { mode: "boolean" }),

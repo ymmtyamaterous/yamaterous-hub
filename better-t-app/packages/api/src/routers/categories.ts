@@ -105,8 +105,9 @@ export const categoriesRouter = {
         .from(category)
         .where(eq(category.id, id))
         .limit(1);
-      if (rows.length === 0) throw new ORPCError("INTERNAL_SERVER_ERROR");
-      return toCategoryOutput(rows[0]);
+      const [created] = rows;
+      if (!created) throw new ORPCError("INTERNAL_SERVER_ERROR");
+      return toCategoryOutput(created);
     }),
 
   update: protectedProcedure
@@ -121,8 +122,10 @@ export const categoriesRouter = {
       if (existing.length === 0) {
         throw new ORPCError("NOT_FOUND", { message: "Category not found" });
       }
+      const [existingCategory] = existing;
+      if (!existingCategory) throw new ORPCError("NOT_FOUND");
 
-      if (input.slug && input.slug !== existing[0].slug) {
+      if (input.slug && input.slug !== existingCategory.slug) {
         const slugConflict = await db
           .select({ id: category.id })
           .from(category)
@@ -151,8 +154,9 @@ export const categoriesRouter = {
         .from(category)
         .where(eq(category.id, input.id))
         .limit(1);
-      if (rows.length === 0) throw new ORPCError("INTERNAL_SERVER_ERROR");
-      return toCategoryOutput(rows[0]);
+      const [updated] = rows;
+      if (!updated) throw new ORPCError("INTERNAL_SERVER_ERROR");
+      return toCategoryOutput(updated);
     }),
 
   delete: protectedProcedure

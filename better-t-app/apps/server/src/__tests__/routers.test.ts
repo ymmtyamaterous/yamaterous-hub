@@ -12,7 +12,7 @@ import { migrate } from "drizzle-orm/libsql/migrator";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import * as schema from "../../../packages/db/src/schema";
+import * as schema from "../../../../packages/db/src/schema";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
@@ -23,7 +23,7 @@ const testDb = drizzle({ client: testClient, schema });
 // マイグレーションを実行してテーブルを作成
 const migrationsFolder = resolve(
   __dirname,
-  "../../../packages/db/src/migrations",
+  "../../../../packages/db/src/migrations",
 );
 await migrate(testDb, { migrationsFolder });
 

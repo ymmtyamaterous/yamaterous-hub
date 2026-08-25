@@ -47,7 +47,9 @@ async function getPodcastWithCategories(id: string) {
 
   if (rows.length === 0) return null;
 
-  const podcastRow = rows[0].podcast;
+  const [firstRow] = rows;
+  if (!firstRow) return null;
+  const podcastRow = firstRow.podcast;
   const categories = rows
     .filter((r) => r.category !== null)
     .map((r) => ({
@@ -234,7 +236,9 @@ export const podcastsRouter = {
         throw new ORPCError("NOT_FOUND", { message: "Podcast not found" });
       }
 
-      const podcastRow = rows[0].podcast;
+      const [firstRow] = rows;
+      if (!firstRow) throw new ORPCError("NOT_FOUND");
+      const podcastRow = firstRow.podcast;
       const categories = rows
         .filter((r) => r.category !== null)
         .map((r) => ({
@@ -316,8 +320,10 @@ export const podcastsRouter = {
       if (existing.length === 0) {
         throw new ORPCError("NOT_FOUND", { message: "Podcast not found" });
       }
+      const [existingPodcast] = existing;
+      if (!existingPodcast) throw new ORPCError("NOT_FOUND");
 
-      if (input.slug && input.slug !== existing[0].slug) {
+      if (input.slug && input.slug !== existingPodcast.slug) {
         const slugConflict = await db
           .select({ id: podcast.id })
           .from(podcast)
@@ -330,12 +336,12 @@ export const podcastsRouter = {
         }
       }
 
-      const wasPublished = existing[0].isPublished;
+      const wasPublished = existingPodcast.isPublished;
       const willPublish = input.isPublished ?? wasPublished;
       const publishedAt =
         !wasPublished && willPublish
           ? new Date()
-          : (existing[0].publishedAt ?? null);
+          : (existingPodcast.publishedAt ?? null);
 
       await db
         .update(podcast)

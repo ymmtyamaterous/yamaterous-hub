@@ -73,7 +73,9 @@ export const profileRouter = {
     if (rows.length === 0) {
       throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
     }
-    return toOutput(rows[0]);
+    const [current] = rows;
+    if (!current) throw new ORPCError("NOT_FOUND");
+    return toOutput(current);
   }),
 
   update: protectedProcedure
@@ -84,7 +86,8 @@ export const profileRouter = {
       if (rows.length === 0) {
         throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
       }
-      const current = rows[0];
+      const [current] = rows;
+      if (!current) throw new ORPCError("NOT_FOUND");
       const updated = await db
         .update(profile)
         .set({
@@ -107,6 +110,8 @@ export const profileRouter = {
         })
         .where(eq(profile.id, current.id))
         .returning();
-      return toOutput(updated[0]);
+      const [updatedProfile] = updated;
+      if (!updatedProfile) throw new ORPCError("INTERNAL_SERVER_ERROR");
+      return toOutput(updatedProfile);
     }),
 };

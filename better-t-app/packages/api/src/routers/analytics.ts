@@ -1,4 +1,4 @@
-import { and, count, desc, gte, isNull, or, sql } from "drizzle-orm";
+import { and, count, desc, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@better-t-app/db";
@@ -49,7 +49,7 @@ export const analyticsRouter = {
   trackClick: publicProcedure
     .input(
       z.object({
-        eventType: z.enum(["work_click", "post_click"]),
+        eventType: z.enum(["work_click", "post_click", "news_click"]),
         targetId: z.string().max(128),
         targetTitle: z.string().max(512),
       }),

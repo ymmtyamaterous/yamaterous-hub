@@ -29,7 +29,9 @@ export const tagsRouter = {
         .insert(tag)
         .values({ id, name: input.name })
         .returning();
-      return { id: inserted[0].id, name: inserted[0].name };
+      const [created] = inserted;
+      if (!created) throw new ORPCError("INTERNAL_SERVER_ERROR");
+      return { id: created.id, name: created.name };
     }),
 
   delete: protectedProcedure

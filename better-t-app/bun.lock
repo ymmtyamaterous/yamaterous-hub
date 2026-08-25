@@ -25,6 +25,7 @@
         "@better-t-app/auth": "workspace:*",
         "@better-t-app/db": "workspace:*",
         "@better-t-app/env": "workspace:*",
+        "@libsql/client": "catalog:",
         "@orpc/openapi": "catalog:",
         "@orpc/server": "catalog:",
         "@orpc/zod": "catalog:",
