@@ -101,6 +101,7 @@ export const post = sqliteTable(
     slug: text("slug").notNull().unique(),
     content: text("content").notNull().default(""),
     excerpt: text("excerpt").notNull().default(""),
+    headerImageUrl: text("header_image_url"),
     isPublished: integer("is_published", { mode: "boolean" })
       .notNull()
       .default(false),

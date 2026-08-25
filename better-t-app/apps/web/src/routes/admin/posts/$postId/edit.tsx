@@ -4,6 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { HeaderImageField } from "@/components/header-image-field";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/admin/posts/$postId/edit")({
@@ -22,6 +23,7 @@ function EditPostPage() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [headerImageUrl, setHeaderImageUrl] = useState("");
   const [content, setContent] = useState("");
   const [isPublished, setIsPublished] = useState(false);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
@@ -33,6 +35,7 @@ function EditPostPage() {
       setTitle(post.title);
       setSlug(post.slug);
       setExcerpt(post.excerpt);
+      setHeaderImageUrl(post.headerImageUrl ?? "");
       setContent(post.content);
       setIsPublished(post.isPublished);
       setSelectedCategoryIds(post.categories.map((c) => c.id));
@@ -66,6 +69,7 @@ function EditPostPage() {
       slug,
       content,
       excerpt,
+      headerImageUrl: headerImageUrl || null,
       isPublished,
       categoryIds: selectedCategoryIds,
     });
@@ -183,6 +187,12 @@ function EditPostPage() {
               className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
             />
           </div>
+          <HeaderImageField
+            value={headerImageUrl}
+            onChange={setHeaderImageUrl}
+            inputStyle={inputStyle}
+            labelStyle={labelStyle}
+          />
           {/* カテゴリ選択 */}
           {categories.length > 0 && (
             <div style={{ gridColumn: "1 / -1" }}>

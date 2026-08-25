@@ -166,6 +166,21 @@ function BlogPostPage() {
           )}
         </div>
 
+        {post.headerImageUrl && (
+          <img
+            src={post.headerImageUrl}
+            alt={`${post.title}のヘッダー画像`}
+            style={{
+              width: "100%",
+              maxHeight: "400px",
+              objectFit: "cover",
+              borderRadius: "4px",
+              marginTop: "1.5rem",
+              border: "1px solid rgba(200,0,90,0.12)",
+            }}
+          />
+        )}
+
         {/* カテゴリバッジ */}
         {post.categories.length > 0 && (
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "0.75rem" }}>

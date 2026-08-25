@@ -1,0 +1,1 @@
+ALTER TABLE `post` ADD `header_image_url` text;

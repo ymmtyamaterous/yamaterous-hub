@@ -29,6 +29,7 @@ const { worksRouter } = await import("@better-t-app/api/routers/works");
 const { tagsRouter } = await import("@better-t-app/api/routers/tags");
 const { analyticsRouter } = await import("@better-t-app/api/routers/analytics");
 const { podcastsRouter } = await import("@better-t-app/api/routers/podcasts");
+const { postsRouter } = await import("@better-t-app/api/routers/posts");
 
 const authCtx = { context: { session: { user: { id: "user-1", name: "Test" } } } };
 const publicCtx = { context: {} };
@@ -76,6 +77,48 @@ describe("tagsRouter", () => {
   });
   test("delete: 存在しないタグで NOT_FOUND を投げる", async () => {
     await expect(call(tagsRouter.delete, { id: "not-exist" }, authCtx)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
+describe("postsRouter", () => {
+  test("create: ヘッダー画像付きの記事を作成できる", async () => {
+    const headerImageUrl = "https://example.com/header.webp";
+    const result = await call(
+      postsRouter.create,
+      {
+        title: "ヘッダー画像付き記事",
+        slug: "post-with-header-image",
+        content: "本文",
+        headerImageUrl,
+      },
+      authCtx,
+    );
+
+    expect(result.headerImageUrl).toBe(headerImageUrl);
+  });
+
+  test("update: ヘッダー画像を設定・削除できる", async () => {
+    const created = await call(
+      postsRouter.create,
+      { title: "更新対象", slug: "header-image-update", content: "本文" },
+      authCtx,
+    );
+    const updated = await call(
+      postsRouter.update,
+      {
+        id: created.id,
+        headerImageUrl: "https://example.com/updated-header.png",
+      },
+      authCtx,
+    );
+    expect(updated.headerImageUrl).toBe("https://example.com/updated-header.png");
+
+    const cleared = await call(
+      postsRouter.update,
+      { id: created.id, headerImageUrl: null },
+      authCtx,
+    );
+    expect(cleared.headerImageUrl).toBeNull();
   });
 });
 

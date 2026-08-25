@@ -4,6 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { HeaderImageField } from "@/components/header-image-field";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/admin/posts/new")({
@@ -17,6 +18,7 @@ function NewPostPage() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [headerImageUrl, setHeaderImageUrl] = useState("");
   const [content, setContent] = useState(
     "# タイトル\n\nここに記事の内容を書いてください。\n\n## セクション\n\nマークダウン形式で書けます。",
   );
@@ -63,6 +65,7 @@ function NewPostPage() {
       slug,
       content,
       excerpt,
+      headerImageUrl: headerImageUrl || null,
       isPublished,
       categoryIds: selectedCategoryIds,
     });
@@ -168,6 +171,12 @@ function NewPostPage() {
               className="dark:!bg-neutral-700/50 dark:!text-neutral-100 dark:!border-pink-900/30"
             />
           </div>
+          <HeaderImageField
+            value={headerImageUrl}
+            onChange={setHeaderImageUrl}
+            inputStyle={inputStyle}
+            labelStyle={labelStyle}
+          />
           {/* カテゴリ選択 */}
           {categories.length > 0 && (
             <div style={{ gridColumn: "1 / -1" }}>

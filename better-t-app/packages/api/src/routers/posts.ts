@@ -25,6 +25,7 @@ const PostOutput = z.object({
   slug: z.string(),
   content: z.string(),
   excerpt: z.string(),
+  headerImageUrl: z.string().nullable(),
   isPublished: z.boolean(),
   publishedAt: z.string().nullable(),
   createdAt: z.string(),
@@ -145,6 +146,7 @@ function toPostOutput(
     slug: row.slug,
     content: row.content,
     excerpt: row.excerpt,
+    headerImageUrl: row.headerImageUrl,
     isPublished: row.isPublished,
     publishedAt: row.publishedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
@@ -176,6 +178,7 @@ const PostCreateInput = z.object({
     .regex(/^[a-z0-9-]+$/, "スラッグは小文字英数字とハイフンのみ使用できます"),
   content: z.string(),
   excerpt: z.string().optional(),
+  headerImageUrl: z.string().url().nullable().optional(),
   isPublished: z.boolean().optional(),
   categoryIds: z.array(z.string()).optional(),
 });
@@ -190,6 +193,7 @@ const PostUpdateInput = z.object({
     .optional(),
   content: z.string().optional(),
   excerpt: z.string().optional(),
+  headerImageUrl: z.string().url().nullable().optional(),
   isPublished: z.boolean().optional(),
   categoryIds: z.array(z.string()).optional(),
 });
@@ -271,6 +275,7 @@ export const postsRouter = {
         slug: input.slug,
         content: input.content,
         excerpt: input.excerpt ?? "",
+        headerImageUrl: input.headerImageUrl ?? null,
         isPublished,
         publishedAt: isPublished ? new Date() : null,
       });
@@ -326,6 +331,9 @@ export const postsRouter = {
           ...(input.slug !== undefined && { slug: input.slug }),
           ...(input.content !== undefined && { content: input.content }),
           ...(input.excerpt !== undefined && { excerpt: input.excerpt }),
+          ...(input.headerImageUrl !== undefined && {
+            headerImageUrl: input.headerImageUrl,
+          }),
           ...(input.isPublished !== undefined && {
             isPublished: input.isPublished,
             publishedAt,
