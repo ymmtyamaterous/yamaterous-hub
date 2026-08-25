@@ -7,6 +7,7 @@
  */
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { createClient } from "@libsql/client";
+import { call } from "@orpc/server";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { resolve } from "node:path";
@@ -55,6 +56,11 @@ const { profileRouter } = await import("@better-t-app/api/routers/profile");
 const { worksRouter } = await import("@better-t-app/api/routers/works");
 const { tagsRouter } = await import("@better-t-app/api/routers/tags");
 
+const authContext = {
+  context: { session: { user: { id: "user-1" } } },
+} as never;
+const publicContext = { context: {} } as never;
+
 // テスト間でテーブルをクリア
 beforeEach(async () => {
   await testDb.delete(schema.workTag);
@@ -70,8 +76,7 @@ beforeEach(async () => {
 describe("profileRouter", () => {
   test("get: プロフィールが存在しない場合 NOT_FOUND を投げる", async () => {
     await expect(
-      // biome-ignore lint/suspicious/noExplicitAny: test context
-      (profileRouter.get as any).handler({ context: {}, input: undefined }),
+      call(profileRouter.get, undefined, publicContext),
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
@@ -82,11 +87,7 @@ describe("profileRouter", () => {
       bio: "テストの自己紹介",
     });
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (profileRouter.get as any).handler({
-      context: {},
-      input: undefined,
-    });
+    const result = await call(profileRouter.get, undefined, publicContext);
     expect(result.displayName).toBe("テストユーザー");
     expect(result.bio).toBe("テストの自己紹介");
   });
@@ -103,42 +104,26 @@ describe("tagsRouter", () => {
       { id: "tag-2", name: "React" },
     ]);
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (tagsRouter.list as any).handler({
-      context: {},
-      input: undefined,
-    });
+    const result = await call(tagsRouter.list, undefined, publicContext);
     expect(result).toHaveLength(2);
     expect(result.map((t: { name: string }) => t.name)).toContain("TypeScript");
   });
 
   test("create: タグを作成できる", async () => {
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (tagsRouter.create as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: { name: "Bun" },
-    });
+    const result = await call(tagsRouter.create, { name: "Bun" }, authContext);
     expect(result.name).toBe("Bun");
     expect(result.id).toBeDefined();
   });
 
   test("delete: タグを削除できる", async () => {
     await testDb.insert(schema.tag).values({ id: "del-tag", name: "削除対象" });
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (tagsRouter.delete as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: { id: "del-tag" },
-    });
+    const result = await call(tagsRouter.delete, { id: "del-tag" }, authContext);
     expect(result.success).toBe(true);
   });
 
   test("delete: 存在しないタグで NOT_FOUND を投げる", async () => {
     await expect(
-      // biome-ignore lint/suspicious/noExplicitAny: test context
-      (tagsRouter.delete as any).handler({
-        context: { session: { user: { id: "user-1" } } },
-        input: { id: "not-exist" },
-      }),
+      call(tagsRouter.delete, { id: "not-exist" }, authContext),
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 });
@@ -166,13 +151,9 @@ describe("worksRouter", () => {
       },
     ]);
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (worksRouter.list as any).handler({
-      context: {},
-      input: undefined,
-    });
+    const result = await call(worksRouter.list, undefined, publicContext);
     expect(result).toHaveLength(1);
-    expect(result[0].title).toBe("公開作品");
+    expect(result[0]?.title).toBe("公開作品");
   });
 
   test("adminList: すべての作品を返す", async () => {
@@ -193,24 +174,20 @@ describe("worksRouter", () => {
       },
     ]);
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (worksRouter.adminList as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: undefined,
-    });
+    const result = await call(worksRouter.adminList, undefined, authContext);
     expect(result).toHaveLength(2);
   });
 
   test("create: 作品を作成できる", async () => {
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (worksRouter.create as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: {
+    const result = await call(
+      worksRouter.create,
+      {
         title: "新しい作品",
         description: "詳細説明",
         isPublished: false,
       },
-    });
+      authContext,
+    );
     expect(result.title).toBe("新しい作品");
     expect(result.isPublished).toBe(false);
     expect(result.tags).toHaveLength(0);
@@ -219,17 +196,17 @@ describe("worksRouter", () => {
   test("create: タグ付きで作品を作成できる", async () => {
     await testDb.insert(schema.tag).values({ id: "tag-ts", name: "TypeScript" });
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (worksRouter.create as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: {
+    const result = await call(
+      worksRouter.create,
+      {
         title: "タグ付き作品",
         description: "説明",
         tagIds: ["tag-ts"],
       },
-    });
+      authContext,
+    );
     expect(result.tags).toHaveLength(1);
-    expect(result.tags[0].name).toBe("TypeScript");
+    expect(result.tags[0]?.name).toBe("TypeScript");
   });
 
   test("update: 作品を更新できる", async () => {
@@ -241,11 +218,11 @@ describe("worksRouter", () => {
       sortOrder: 0,
     });
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (worksRouter.update as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: { id: "upd-w", title: "新しいタイトル", isPublished: true },
-    });
+    const result = await call(
+      worksRouter.update,
+      { id: "upd-w", title: "新しいタイトル", isPublished: true },
+      authContext,
+    );
     expect(result.title).toBe("新しいタイトル");
     expect(result.isPublished).toBe(true);
   });
@@ -259,11 +236,7 @@ describe("worksRouter", () => {
       sortOrder: 0,
     });
 
-    // biome-ignore lint/suspicious/noExplicitAny: test context
-    const result = await (worksRouter.delete as any).handler({
-      context: { session: { user: { id: "user-1" } } },
-      input: { id: "del-w" },
-    });
+    const result = await call(worksRouter.delete, { id: "del-w" }, authContext);
     expect(result.success).toBe(true);
   });
 
@@ -277,11 +250,7 @@ describe("worksRouter", () => {
     });
 
     await expect(
-      // biome-ignore lint/suspicious/noExplicitAny: test context
-      (worksRouter.getById as any).handler({
-        context: {},
-        input: { id: "private-w" },
-      }),
+      call(worksRouter.getById, { id: "private-w" }, publicContext),
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 });

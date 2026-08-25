@@ -8,7 +8,7 @@
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
     "dev": "bun run --hot src/index.ts",
     "start": "bun run dist/index.mjs",
-    "test": "bun test src/__tests__"
+    "test": "bun test src/__tests__/routers.test.ts"
   },
   "dependencies": {
     "@better-t-app/api": "workspace:*",
