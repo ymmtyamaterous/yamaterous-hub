@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { HeaderImageField } from "@/components/header-image-field";
 import { orpc } from "@/utils/orpc";
+import { countContentCharacters } from "@/utils/content-character-count";
 
 export const Route = createFileRoute("/admin/posts/$postId/edit")({
   component: EditPostPage,
@@ -298,7 +299,7 @@ function EditPostPage() {
               color: "var(--sc-muted)",
             }}
           >
-            // CONTENT EDITOR
+            // CONTENT EDITOR — {countContentCharacters(content).toLocaleString()} 文字
           </div>
           <MDEditor
             value={content}
